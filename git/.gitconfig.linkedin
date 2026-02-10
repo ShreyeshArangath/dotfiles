@@ -1,0 +1,6 @@
+# LinkedIn Work Git Configuration
+# Copy to ~/.gitconfig.local on work machines: cp ~/dotfiles/git/.gitconfig.linkedin ~/.gitconfig.local
+
+[user]
+	name = Shreyesh Shaju Arangath
+	email = sarangath@linkedin.com

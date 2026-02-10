@@ -1,0 +1,101 @@
+- defaults:
+    link:
+      relink: true
+      create: true
+
+- clean: ['~']
+
+- create:
+    - ~/.config
+    - ~/.local/bin
+    - ~/.cache
+
+- link:
+    ~/.zshrc: zsh/.zshrc
+    ~/.gitconfig: git/.gitconfig
+    ~/.tmux.conf: tmux/.tmux.conf
+    ~/.config/nvim: nvim
+
+- shell:
+    - description: Installing Homebrew packages
+      command: |
+        if command -v brew >/dev/null 2>&1; then
+          echo "Installing packages from Brewfile..."
+          brew bundle --file=Brewfile || true
+        else
+          echo "Homebrew not found. Skipping package installation."
+          echo "Please install Homebrew first: /bin/bash -c \"\$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\""
+        fi
+      stdout: true
+      stderr: true
+
+    - description: Installing Oh My Zsh
+      command: |
+        if [ ! -d "$HOME/.oh-my-zsh" ]; then
+          echo "Installing Oh My Zsh..."
+          sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+        else
+          echo "Oh My Zsh already installed"
+        fi
+      stdout: true
+      stderr: true
+
+    - description: Installing zsh-autosuggestions
+      command: |
+        ZSH_CUSTOM=${ZSH_CUSTOM:-~/.oh-my-zsh/custom}
+        if [ ! -d "$ZSH_CUSTOM/plugins/zsh-autosuggestions" ]; then
+          echo "Installing zsh-autosuggestions..."
+          git clone https://github.com/zsh-users/zsh-autosuggestions "$ZSH_CUSTOM/plugins/zsh-autosuggestions"
+        else
+          echo "zsh-autosuggestions already installed"
+        fi
+      stdout: true
+      stderr: true
+
+    - description: Installing zsh-syntax-highlighting
+      command: |
+        ZSH_CUSTOM=${ZSH_CUSTOM:-~/.oh-my-zsh/custom}
+        if [ ! -d "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting" ]; then
+          echo "Installing zsh-syntax-highlighting..."
+          git clone https://github.com/zsh-users/zsh-syntax-highlighting "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting"
+        else
+          echo "zsh-syntax-highlighting already installed"
+        fi
+      stdout: true
+      stderr: true
+
+    - description: Installing Tmux Plugin Manager (TPM)
+      command: |
+        if [ ! -d "$HOME/.tmux/plugins/tpm" ]; then
+          echo "Installing Tmux Plugin Manager..."
+          git clone https://github.com/tmux-plugins/tpm "$HOME/.tmux/plugins/tpm"
+        else
+          echo "TPM already installed"
+        fi
+      stdout: true
+      stderr: true
+
+- shell:
+    - description: Post-installation instructions
+      command: |
+        echo ""
+        echo "=========================================="
+        echo "  Dotfiles Installation Complete!"
+        echo "=========================================="
+        echo ""
+        echo "Next steps:"
+        echo "  1. Restart your terminal or run: source ~/.zshrc"
+        echo "  2. Open Neovim and run :Lazy sync to install plugins"
+        echo "  3. Open tmux and press prefix + I (capital i) to install plugins"
+        echo ""
+        echo "For LinkedIn work machines:"
+        echo "  1. Create ~/.zshrc.local with your work-specific configurations"
+        echo "  2. Run: cp ~/dotfiles/git/.gitconfig.linkedin ~/.gitconfig.local"
+        echo "  3. Restart your terminal"
+        echo ""
+        echo "SSH key management:"
+        echo "  - personal_ssh  : Load personal SSH key"
+        echo "  - work_ssh      : Load LinkedIn SSH key (work machines)"
+        echo "  - reload_ssh_keys : Load both keys (work machines)"
+        echo ""
+      stdout: true
