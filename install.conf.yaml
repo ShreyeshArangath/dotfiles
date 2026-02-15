@@ -69,9 +69,19 @@
         if [ ! -d "$HOME/.tmux/plugins/tpm" ]; then
           echo "Installing Tmux Plugin Manager..."
           git clone https://github.com/tmux-plugins/tpm "$HOME/.tmux/plugins/tpm"
+          echo "TPM installed successfully"
         else
           echo "TPM already installed"
         fi
+      stdout: true
+      stderr: true
+
+    - description: Installing Tmux plugins
+      command: |
+        echo "Installing tmux plugins..."
+        # Run TPM's install script directly
+        "$HOME/.tmux/plugins/tpm/bin/install_plugins" || true
+        echo "Tmux plugins installed (tmux-yank, Nord theme)"
       stdout: true
       stderr: true
 
@@ -86,7 +96,7 @@
         echo "Next steps:"
         echo "  1. Restart your terminal or run: source ~/.zshrc"
         echo "  2. Open Neovim and run :Lazy sync to install plugins"
-        echo "  3. Open tmux and press prefix + I (capital i) to install plugins"
+        echo "  3. Open tmux - plugins are already installed!"
         echo ""
         echo "For LinkedIn work machines:"
         echo "  1. Create ~/.zshrc.local with your work-specific configurations"

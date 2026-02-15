@@ -15,7 +15,7 @@ That's it! The script will:
 - Install all development tools and utilities
 - Install Oh My Zsh with plugins
 - Create all configuration symlinks
-- Set up Tmux Plugin Manager
+- Set up Tmux Plugin Manager and install plugins (tmux-yank, Nord theme)
 
 ## Post-Installation Steps
 
@@ -33,10 +33,10 @@ After running the bootstrap script:
    # Or manually run: :Lazy sync
    ```
 
-3. **Install Tmux plugins**:
-   - Open tmux: `tmux`
-   - Press `prefix + I` (capital i) to install plugins
-   - Default prefix is `Ctrl-b`
+3. **Tmux is ready to use**:
+   - Plugins are automatically installed (tmux-yank, Nord theme)
+   - Just run `tmux` to start
+   - See Tmux section below for key bindings
 
 ## Work Machine Setup
 
@@ -136,9 +136,53 @@ dotfiles/
 
 ### Tmux
 
-- Vim-style navigation
-- Tmux Plugin Manager (TPM) integration
-- Custom keybindings for pane management
+**Features:**
+- Vim-style pane navigation (prefix + h/j/k/l)
+- Alt navigation without prefix (Alt + h/j/k/l)
+- Nord theme for beautiful aesthetics
+- TPM integration with auto-installed plugins
+- Mouse support enabled
+- Vi mode for copy/paste
+
+**Key Bindings:**
+
+*Pane Navigation:*
+- `prefix + h/j/k/l` - Navigate panes (vim-style)
+- `Alt + h/j/k/l` - Navigate panes (no prefix needed)
+- `Alt + H/J/K/L` - Resize panes
+
+*Window Management:*
+- `Alt + 1-5` - Jump to window 1-5
+- `Alt + n/p` - Next/previous window
+- `Alt + Tab` - Last window
+- `prefix + c` - Create new window (prompts for name)
+- `prefix + |` - Split horizontally
+- `prefix + -` - Split vertically
+
+*Session Management:*
+- `Alt + [/]` - Switch between sessions
+- `prefix + S` - Session tree chooser
+- `prefix + N` - Create new session (prompts for name)
+- `prefix + R` - Rename current session
+
+*Copy Mode (vi-style):*
+- `prefix + [` - Enter copy mode
+- `v` - Begin selection
+- `y` - Yank and exit
+- `Y` - Yank without exiting
+- `Ctrl-u/d` - Half-page scroll
+
+*Other:*
+- `prefix + r` - Reload tmux config
+
+**Plugins:**
+- [TPM](https://github.com/tmux-plugins/tpm) - Plugin manager
+- [tmux-yank](https://github.com/tmux-plugins/tmux-yank) - Better clipboard integration
+- [Nord theme](https://github.com/nordtheme/tmux) - Beautiful color scheme
+
+**Note for macOS users:** To use Alt navigation, configure your terminal:
+- **iTerm2**: Preferences → Profiles → Keys → Set left/right option key to "Esc+"
+- **Terminal.app**: Enable "Use Option as Meta key" in preferences
 
 ### Neovim
 
@@ -252,11 +296,17 @@ nvim +Lazy sync
 ### Tmux plugins not loading
 
 ```bash
-# Reinstall TPM
-rm -rf ~/.tmux/plugins/tpm
-git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
-# Open tmux and press prefix + I
+# Reinstall TPM and plugins
+rm -rf ~/.tmux/plugins
+./bootstrap.sh
+# Plugins will be automatically installed
 ```
+
+### Alt navigation not working in tmux
+
+Configure your terminal emulator:
+- **iTerm2**: Preferences → Profiles → Keys → Set left/right option key to "Esc+"
+- **Terminal.app**: Preferences → Profiles → Keyboard → Enable "Use Option as Meta key"
 
 ### Homebrew not found (Apple Silicon)
 
