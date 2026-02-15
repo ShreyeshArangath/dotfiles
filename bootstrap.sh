@@ -52,13 +52,13 @@ if [ "$DISTRO" = "macos" ]; then
     fi
 elif [ "$DISTRO" = "mariner" ]; then
     # CBL-Mariner (Microsoft's Linux distro, used by LinkedIn)
-    echo -e "${YELLOW}Installing essential packages via tdnf (Mariner)...${NC}"
+    echo -e "${YELLOW}Installing essential packages via yum (Mariner)...${NC}"
 
-    if command -v tdnf &> /dev/null; then
-        PKG_MGR="tdnf"
-        echo "Using tdnf package manager (CBL-Mariner)"
+    if command -v yum &> /dev/null; then
+        PKG_MGR="yum"
+        echo "Using yum package manager (CBL-Mariner)"
     else
-        echo -e "${RED}Error: tdnf not found on this system${NC}"
+        echo -e "${RED}Error: yum not found on this system${NC}"
         echo -e "${YELLOW}Please install packages manually: git curl wget zsh tmux${NC}"
         PKG_MGR=""
     fi
