@@ -17,15 +17,27 @@
     ~/.config/nvim: nvim
 
 - shell:
-    - description: Installing Homebrew packages
+    - description: Installing platform-specific packages
       command: |
-        if command -v brew >/dev/null 2>&1; then
-          echo "Installing packages from Brewfile..."
-          brew bundle --file=Brewfile || true
-        else
-          echo "Homebrew not found. Skipping package installation."
-          echo "Please install Homebrew first: /bin/bash -c \"\$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\""
-        fi
+        OS="$(uname -s)"
+        case "${OS}" in
+          Darwin*)
+            # macOS - use Homebrew
+            if command -v brew >/dev/null 2>&1; then
+              echo "Installing packages from Brewfile..."
+              brew bundle --file=Brewfile || true
+            else
+              echo "Homebrew not found. Skipping macOS package installation."
+            fi
+            ;;
+          Linux*)
+            # Linux - packages should already be installed by bootstrap.sh
+            echo "Linux detected. Essential packages installed by bootstrap.sh"
+            ;;
+          *)
+            echo "Unknown OS. Skipping package installation."
+            ;;
+        esac
       stdout: true
       stderr: true
 

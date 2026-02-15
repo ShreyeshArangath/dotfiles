@@ -1,6 +1,6 @@
 # Dotfiles
 
-Personal development environment configuration managed with [Dotbot](https://github.com/anishathalye/dotbot). This repository provides a complete, reproducible development environment setup that works across personal and work machines.
+Personal development environment configuration managed with [Dotbot](https://github.com/anishathalye/dotbot). This repository provides a complete, reproducible development environment setup that works across personal and work machines (macOS and Linux).
 
 ## Quick Start
 
@@ -11,11 +11,16 @@ cd ~/dotfiles
 ```
 
 That's it! The script will:
-- Install Homebrew (if not present)
-- Install all development tools and utilities
+- **macOS**: Install Homebrew (if not present) and packages from Brewfile
+- **Linux**: Install essential packages via yum/dnf (RHEL/CentOS/Fedora/Amazon Linux) or apt (Ubuntu/Debian)
 - Install Oh My Zsh with plugins
 - Create all configuration symlinks
 - Set up Tmux Plugin Manager and install plugins (tmux-yank, Nord theme)
+
+### Supported Platforms
+
+- **macOS**: Intel (x86_64) and Apple Silicon (arm64/M1/M2/M3)
+- **Linux**: RHEL-based (yum/dnf) and Debian-based (apt)
 
 ## Post-Installation Steps
 
@@ -219,9 +224,24 @@ git pull
 ./bootstrap.sh  # Re-run to update symlinks and dependencies
 ```
 
-**Update Homebrew packages:**
+**Update packages:**
+
+macOS (Homebrew):
 ```bash
 brew bundle --file=~/dotfiles/Brewfile
+brew upgrade
+```
+
+Linux (RHEL/CentOS/Fedora):
+```bash
+sudo yum update
+# or
+sudo dnf upgrade
+```
+
+Linux (Ubuntu/Debian):
+```bash
+sudo apt update && sudo apt upgrade
 ```
 
 **Update Neovim plugins:**
