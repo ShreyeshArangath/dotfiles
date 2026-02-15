@@ -92,9 +92,28 @@
     - description: Installing Tmux plugins
       command: |
         echo "Installing tmux plugins..."
-        # Run TPM's install script directly
-        "$HOME/.tmux/plugins/tpm/bin/install_plugins" || true
-        echo "Tmux plugins installed (tmux-yank, Nord theme)"
+        if [ -f "$HOME/.tmux/plugins/tpm/bin/install_plugins" ]; then
+          # Set TMUX_PLUGIN_MANAGER_PATH for TPM
+          export TMUX_PLUGIN_MANAGER_PATH="$HOME/.tmux/plugins"
+
+          # Run TPM's install script
+          bash "$HOME/.tmux/plugins/tpm/bin/install_plugins"
+
+          # Verify plugins were installed
+          if [ -d "$HOME/.tmux/plugins/tmux" ]; then
+            echo "Catppuccin theme installed successfully"
+          else
+            echo "Warning: Catppuccin theme may not have installed correctly"
+          fi
+
+          if [ -d "$HOME/.tmux/plugins/tmux-yank" ]; then
+            echo "tmux-yank installed successfully"
+          else
+            echo "Warning: tmux-yank may not have installed correctly"
+          fi
+        else
+          echo "TPM not found, skipping plugin installation"
+        fi
       stdout: true
       stderr: true
 
