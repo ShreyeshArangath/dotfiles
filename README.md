@@ -13,7 +13,7 @@ cd ~/dotfiles
 That's it! The script will:
 - **macOS**: Install Homebrew (if not present) and packages from Brewfile
 - **Linux**: Install essential packages via yum/dnf (RHEL/CentOS/Fedora/Amazon Linux) or apt (Ubuntu/Debian)
-- Backup existing config files (if any) to `~/.dotfiles_backup_TIMESTAMP/`
+- Backup existing config files (if any) to `~/.dotfiles_backup/` (overwrites previous backup)
 - Install Oh My Zsh with plugins
 - Create all configuration symlinks
 - Set up Tmux Plugin Manager and install plugins (tmux-yank, Nord theme)

@@ -122,13 +122,22 @@ git submodule update --init --recursive
 # Backup and remove existing config files that should be symlinked
 echo ""
 echo -e "${YELLOW}Preparing config files for symlinking...${NC}"
-BACKUP_DIR="$HOME/.dotfiles_backup_$(date +%Y%m%d_%H%M%S)"
+BACKUP_DIR="$HOME/.dotfiles_backup"
+
+# Remove old backup if it exists
+if [ -d "$BACKUP_DIR" ]; then
+    echo "Removing old backup directory..."
+    rm -rf "$BACKUP_DIR"
+fi
+
+BACKED_UP=false
 
 for config_file in "$HOME/.zshrc" "$HOME/.gitconfig" "$HOME/.tmux.conf"; do
     if [ -f "$config_file" ] && [ ! -L "$config_file" ]; then
         echo "Backing up existing $(basename $config_file) to $BACKUP_DIR"
         mkdir -p "$BACKUP_DIR"
         mv "$config_file" "$BACKUP_DIR/"
+        BACKED_UP=true
     fi
 done
 
@@ -136,9 +145,10 @@ if [ -d "$HOME/.config/nvim" ] && [ ! -L "$HOME/.config/nvim" ]; then
     echo "Backing up existing nvim config to $BACKUP_DIR"
     mkdir -p "$BACKUP_DIR"
     mv "$HOME/.config/nvim" "$BACKUP_DIR/"
+    BACKED_UP=true
 fi
 
-if [ -d "$BACKUP_DIR" ]; then
+if [ "$BACKED_UP" = true ]; then
     echo -e "${GREEN}Existing configs backed up to: $BACKUP_DIR${NC}"
 fi
 
