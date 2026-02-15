@@ -43,9 +43,16 @@
 
     - description: Installing Oh My Zsh
       command: |
-        if [ ! -d "$HOME/.oh-my-zsh" ]; then
+        if [ ! -f "$HOME/.oh-my-zsh/oh-my-zsh.sh" ]; then
           echo "Installing Oh My Zsh..."
+          # Remove incomplete installation if exists
+          rm -rf "$HOME/.oh-my-zsh"
           sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+          if [ -f "$HOME/.oh-my-zsh/oh-my-zsh.sh" ]; then
+            echo "Oh My Zsh installed successfully"
+          else
+            echo "Oh My Zsh installation may have failed"
+          fi
         else
           echo "Oh My Zsh already installed"
         fi
