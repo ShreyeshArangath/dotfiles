@@ -24,15 +24,19 @@ export PATH="$HOME/.cargo/bin:$PATH"
 # ========================================
 # Zsh Configuration
 # ========================================
-# Enable colors
+# Enable colors and vcs info
 autoload -U colors && colors
-
-# Set prompt (simple git-aware prompt)
 autoload -Uz vcs_info
+
+# Git branch info
 precmd() { vcs_info }
-zstyle ':vcs_info:git:*' formats ' (%b)'
+zstyle ':vcs_info:git:*' formats ' %F{yellow}(%b)%f'
+zstyle ':vcs_info:*' enable git
+
 setopt PROMPT_SUBST
-PROMPT='%{$fg[green]%}%n@%m%{$reset_color%} %{$fg[blue]%}%~%{$reset_color%}%{$fg[yellow]%}${vcs_info_msg_0_}%{$reset_color%} %# '
+
+# Prompt: user@host ~/path (branch) %
+PROMPT='%F{green}%n@%m%f %F{cyan}%~%f${vcs_info_msg_0_} %# '
 
 # History configuration
 HISTSIZE=10000
