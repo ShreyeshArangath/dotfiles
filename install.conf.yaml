@@ -7,7 +7,7 @@
 
 - create:
     - ~/.config
-    - ~/.config/zsh/plugins
+    - ~/.zsh
     - ~/.local/bin
     - ~/.cache
 
@@ -42,9 +42,20 @@
       stdout: true
       stderr: true
 
+    - description: Installing Powerlevel10k
+      command: |
+        if [ ! -d "$HOME/.powerlevel10k" ]; then
+          echo "Installing Powerlevel10k..."
+          git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ~/.powerlevel10k
+        else
+          echo "Powerlevel10k already installed"
+        fi
+      stdout: true
+      stderr: true
+
     - description: Installing zsh-autosuggestions
       command: |
-        PLUGIN_DIR="$HOME/.config/zsh/plugins/zsh-autosuggestions"
+        PLUGIN_DIR="$HOME/.zsh/zsh-autosuggestions"
         if [ ! -d "$PLUGIN_DIR" ]; then
           echo "Installing zsh-autosuggestions..."
           git clone https://github.com/zsh-users/zsh-autosuggestions "$PLUGIN_DIR"
@@ -56,7 +67,7 @@
 
     - description: Installing zsh-syntax-highlighting
       command: |
-        PLUGIN_DIR="$HOME/.config/zsh/plugins/zsh-syntax-highlighting"
+        PLUGIN_DIR="$HOME/.zsh/zsh-syntax-highlighting"
         if [ ! -d "$PLUGIN_DIR" ]; then
           echo "Installing zsh-syntax-highlighting..."
           git clone https://github.com/zsh-users/zsh-syntax-highlighting "$PLUGIN_DIR"

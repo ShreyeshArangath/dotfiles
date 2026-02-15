@@ -1,4 +1,11 @@
 # ========================================
+# Powerlevel10k Instant Prompt
+# ========================================
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
+
+# ========================================
 # XDG Base Directory Specification
 # ========================================
 export XDG_CONFIG_HOME="$HOME/.config"
@@ -15,53 +22,57 @@ export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
 # System paths
 export PATH="/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:$PATH"
 
+# LinkedIn paths (work machines)
+export PATH="/usr/local/linkedin/bin:/export/content/linkedin/bin:/export/content/granular/bin:$PATH"
+
 # User local binaries
 export PATH="$HOME/.local/bin:$PATH"
 
 # Cargo (Rust)
 export PATH="$HOME/.cargo/bin:$PATH"
 
+# Tools
+export PATH="$HOME/tools/kubectl-plugins:$PATH"
+
 # ========================================
 # Zsh Configuration
 # ========================================
-# Enable colors and vcs info
-autoload -U colors && colors
-autoload -Uz vcs_info
-
-# Git branch info
-precmd() { vcs_info }
-zstyle ':vcs_info:git:*' formats ' %F{yellow}(%b)%f'
-zstyle ':vcs_info:*' enable git
-
-setopt PROMPT_SUBST
-
-# Prompt: user@host ~/path (branch) %
-PROMPT='%F{green}%n@%m%f %F{cyan}%~%f${vcs_info_msg_0_} %# '
+export ZSH="$HOME/.zsh"
 
 # History configuration
-HISTSIZE=10000
-SAVEHIST=10000
 HISTFILE=~/.zsh_history
-setopt APPEND_HISTORY
-setopt SHARE_HISTORY
-setopt HIST_IGNORE_DUPS
-setopt HIST_IGNORE_SPACE
+HISTSIZE=100000
+SAVEHIST=100000
+setopt HIST_SAVE_NO_DUPS
+setopt INC_APPEND_HISTORY
 
-# Basic completions
-autoload -Uz compinit && compinit
+# Directory navigation
+setopt AUTO_PUSHD
+setopt PUSHD_IGNORE_DUPS
+setopt PUSHD_SILENT
+setopt autocd
 
-# Load zsh plugins (if installed)
-ZSH_PLUGINS_DIR="$HOME/.config/zsh/plugins"
+# Vim mode keybindings
+bindkey -v
+KEYTIMEOUT=1
+bindkey "\e[A" history-beginning-search-backward
+bindkey "\e[B" history-beginning-search-forward
 
-# zsh-autosuggestions
-if [ -f "$ZSH_PLUGINS_DIR/zsh-autosuggestions/zsh-autosuggestions.zsh" ]; then
-    source "$ZSH_PLUGINS_DIR/zsh-autosuggestions/zsh-autosuggestions.zsh"
-fi
+# Completion
+autoload -U compinit
+compinit
 
-# zsh-syntax-highlighting (must be sourced at the end)
-if [ -f "$ZSH_PLUGINS_DIR/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ]; then
-    source "$ZSH_PLUGINS_DIR/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
-fi
+# ========================================
+# Prompt (Powerlevel10k)
+# ========================================
+[[ -r ~/.powerlevel10k/powerlevel10k.zsh-theme ]] && source ~/.powerlevel10k/powerlevel10k.zsh-theme
+[[ -r ~/.p10k.zsh ]] && source ~/.p10k.zsh
+
+# ========================================
+# Zsh Plugins
+# ========================================
+[[ -r ~/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh ]] && source ~/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
+[[ -r ~/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]] && source ~/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 # ========================================
 # Development Tools
