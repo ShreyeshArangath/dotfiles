@@ -7,6 +7,7 @@
 
 - create:
     - ~/.config
+    - ~/.config/zsh/plugins
     - ~/.local/bin
     - ~/.cache
 
@@ -41,30 +42,12 @@
       stdout: true
       stderr: true
 
-    - description: Installing Oh My Zsh
-      command: |
-        if [ ! -f "$HOME/.oh-my-zsh/oh-my-zsh.sh" ]; then
-          echo "Installing Oh My Zsh..."
-          # Remove incomplete installation if exists
-          rm -rf "$HOME/.oh-my-zsh"
-          sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
-          if [ -f "$HOME/.oh-my-zsh/oh-my-zsh.sh" ]; then
-            echo "Oh My Zsh installed successfully"
-          else
-            echo "Oh My Zsh installation may have failed"
-          fi
-        else
-          echo "Oh My Zsh already installed"
-        fi
-      stdout: true
-      stderr: true
-
     - description: Installing zsh-autosuggestions
       command: |
-        ZSH_CUSTOM=${ZSH_CUSTOM:-~/.oh-my-zsh/custom}
-        if [ ! -d "$ZSH_CUSTOM/plugins/zsh-autosuggestions" ]; then
+        PLUGIN_DIR="$HOME/.config/zsh/plugins/zsh-autosuggestions"
+        if [ ! -d "$PLUGIN_DIR" ]; then
           echo "Installing zsh-autosuggestions..."
-          git clone https://github.com/zsh-users/zsh-autosuggestions "$ZSH_CUSTOM/plugins/zsh-autosuggestions"
+          git clone https://github.com/zsh-users/zsh-autosuggestions "$PLUGIN_DIR"
         else
           echo "zsh-autosuggestions already installed"
         fi
@@ -73,10 +56,10 @@
 
     - description: Installing zsh-syntax-highlighting
       command: |
-        ZSH_CUSTOM=${ZSH_CUSTOM:-~/.oh-my-zsh/custom}
-        if [ ! -d "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting" ]; then
+        PLUGIN_DIR="$HOME/.config/zsh/plugins/zsh-syntax-highlighting"
+        if [ ! -d "$PLUGIN_DIR" ]; then
           echo "Installing zsh-syntax-highlighting..."
-          git clone https://github.com/zsh-users/zsh-syntax-highlighting "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting"
+          git clone https://github.com/zsh-users/zsh-syntax-highlighting "$PLUGIN_DIR"
         else
           echo "zsh-syntax-highlighting already installed"
         fi
@@ -113,9 +96,10 @@
         echo "=========================================="
         echo ""
         echo "Next steps:"
-        echo "  1. Restart your terminal or run: source ~/.zshrc"
-        echo "  2. Open Neovim and run :Lazy sync to install plugins"
-        echo "  3. Open tmux - plugins are already installed!"
+        echo "  1. Change shell to zsh: chsh -s \$(which zsh)"
+        echo "  2. Restart your terminal or run: zsh"
+        echo "  3. Open Neovim and run :Lazy sync to install plugins"
+        echo "  4. Open tmux - plugins are already installed!"
         echo ""
         echo "For LinkedIn work machines:"
         echo "  1. Create ~/.zshrc.local with your work-specific configurations"

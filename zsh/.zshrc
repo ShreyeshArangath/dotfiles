@@ -22,14 +22,42 @@ export PATH="$HOME/.local/bin:$PATH"
 export PATH="$HOME/.cargo/bin:$PATH"
 
 # ========================================
-# Oh My Zsh Configuration
+# Zsh Configuration
 # ========================================
-export ZSH="$HOME/.oh-my-zsh"
-ZSH_THEME="robbyrussell"
-ZSH_THEME_RANDOM_CANDIDATES=("robbyrussell" "agnoster")
-plugins=(git zsh-autosuggestions zsh-syntax-highlighting)
-zstyle ':omz:plugins:nvm' lazy yes
-source $ZSH/oh-my-zsh.sh
+# Enable colors
+autoload -U colors && colors
+
+# Set prompt (simple git-aware prompt)
+autoload -Uz vcs_info
+precmd() { vcs_info }
+zstyle ':vcs_info:git:*' formats ' (%b)'
+setopt PROMPT_SUBST
+PROMPT='%{$fg[green]%}%n@%m%{$reset_color%} %{$fg[blue]%}%~%{$reset_color%}%{$fg[yellow]%}${vcs_info_msg_0_}%{$reset_color%} %# '
+
+# History configuration
+HISTSIZE=10000
+SAVEHIST=10000
+HISTFILE=~/.zsh_history
+setopt APPEND_HISTORY
+setopt SHARE_HISTORY
+setopt HIST_IGNORE_DUPS
+setopt HIST_IGNORE_SPACE
+
+# Basic completions
+autoload -Uz compinit && compinit
+
+# Load zsh plugins (if installed)
+ZSH_PLUGINS_DIR="$HOME/.config/zsh/plugins"
+
+# zsh-autosuggestions
+if [ -f "$ZSH_PLUGINS_DIR/zsh-autosuggestions/zsh-autosuggestions.zsh" ]; then
+    source "$ZSH_PLUGINS_DIR/zsh-autosuggestions/zsh-autosuggestions.zsh"
+fi
+
+# zsh-syntax-highlighting (must be sourced at the end)
+if [ -f "$ZSH_PLUGINS_DIR/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ]; then
+    source "$ZSH_PLUGINS_DIR/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+fi
 
 # ========================================
 # Development Tools

@@ -12,9 +12,9 @@ cd ~/dotfiles
 
 That's it! The script will:
 - **macOS**: Install Homebrew (if not present) and packages from Brewfile
-- **Linux**: Install essential packages via yum/dnf (RHEL/CentOS/Fedora/Amazon Linux) or apt (Ubuntu/Debian)
+- **Linux**: Install essential packages via yum/dnf (RHEL/CentOS/Fedora/Amazon Linux/Mariner) or apt (Ubuntu/Debian)
 - Backup existing config files (if any) to `~/.dotfiles_backup/` (overwrites previous backup)
-- Install Oh My Zsh with plugins
+- Install zsh plugins (autosuggestions, syntax-highlighting)
 - Create all configuration symlinks
 - Set up Tmux Plugin Manager and install plugins (tmux-yank, Catppuccin theme)
 - Reload tmux configuration if tmux is running
@@ -22,15 +22,19 @@ That's it! The script will:
 ### Supported Platforms
 
 - **macOS**: Intel (x86_64) and Apple Silicon (arm64/M1/M2/M3)
-- **Linux**: RHEL-based (yum/dnf) and Debian-based (apt)
+- **Linux**:
+  - RHEL-based (yum/dnf)
+  - CBL-Mariner (yum)
+  - Debian-based (apt)
 
 ## Post-Installation Steps
 
 After running the bootstrap script:
 
-1. **Restart your terminal** or run:
+1. **Change your default shell to zsh**:
    ```bash
-   source ~/.zshrc
+   chsh -s $(which zsh)
+   # Then logout/login or run: zsh
    ```
 
 2. **Install Neovim plugins**:
@@ -116,10 +120,11 @@ dotfiles/
 **Personal Configuration (`.zshrc`):**
 - XDG Base Directory setup
 - Homebrew, Volta, Go, Rust paths
-- Oh My Zsh with plugins:
-  - `git` - Git aliases and functions
-  - `zsh-autosuggestions` - Command suggestions
-  - `zsh-syntax-highlighting` - Syntax highlighting
+- Simple git-aware prompt with branch info
+- History configuration (shared across sessions)
+- Zsh plugins (installed to `~/.config/zsh/plugins/`):
+  - `zsh-autosuggestions` - Command suggestions based on history
+  - `zsh-syntax-highlighting` - Syntax highlighting as you type
 - Personal SSH key management (`personal_ssh()`)
 - Aliases: `vi`/`vim` → `nvim`
 
