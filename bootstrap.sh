@@ -57,52 +57,76 @@ elif [ "$DISTRO" = "rhel" ] || [ "$DISTRO" = "centos" ] || [ "$DISTRO" = "fedora
     # Determine if we should use dnf or yum
     if command -v dnf &> /dev/null; then
         PKG_MGR="dnf"
-    else
+        echo "Using dnf package manager"
+    elif command -v yum &> /dev/null; then
         PKG_MGR="yum"
-    fi
-
-    # Install EPEL repository for additional packages
-    if [ "$DISTRO" = "rhel" ] || [ "$DISTRO" = "centos" ]; then
-        sudo $PKG_MGR install -y epel-release || true
-    fi
-
-    # Install essential development tools
-    sudo $PKG_MGR groupinstall -y "Development Tools" || true
-    sudo $PKG_MGR install -y \
-        git \
-        curl \
-        wget \
-        zsh \
-        tmux \
-        gcc \
-        make \
-        python3 \
-        python3-pip \
-        openssl-devel \
-        bzip2-devel \
-        libffi-devel \
-        || true
-
-    # Try to install neovim from package manager
-    if sudo $PKG_MGR install -y neovim; then
-        echo -e "${GREEN}Neovim installed from package manager${NC}"
+        echo "Using yum package manager"
     else
-        echo -e "${YELLOW}Neovim not available in repos, installing from AppImage...${NC}"
-        # Install neovim via AppImage as fallback
-        if [ ! -f "$HOME/.local/bin/nvim" ]; then
-            mkdir -p "$HOME/.local/bin"
-            curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim.appimage
-            chmod u+x nvim.appimage
-            mv nvim.appimage "$HOME/.local/bin/nvim"
-            echo -e "${GREEN}Neovim installed via AppImage${NC}"
+        echo -e "${RED}Error: Neither dnf nor yum found on this system${NC}"
+        echo -e "${YELLOW}Please install packages manually: git curl wget zsh tmux${NC}"
+        PKG_MGR=""
+    fi
+
+    if [ -n "$PKG_MGR" ]; then
+        # Install EPEL repository for additional packages
+        if [ "$DISTRO" = "rhel" ] || [ "$DISTRO" = "centos" ]; then
+            echo "Installing EPEL repository..."
+            sudo $PKG_MGR install -y epel-release || echo "EPEL installation failed or already installed"
+        fi
+
+        # Install essential development tools
+        echo "Installing Development Tools..."
+        sudo $PKG_MGR groupinstall -y "Development Tools" || echo "Development Tools installation failed or already installed"
+
+        echo "Installing essential packages..."
+        sudo $PKG_MGR install -y \
+            git \
+            curl \
+            wget \
+            zsh \
+            tmux \
+            gcc \
+            make \
+            python3 \
+            python3-pip \
+            openssl-devel \
+            bzip2-devel \
+            libffi-devel
+
+        if [ $? -ne 0 ]; then
+            echo -e "${RED}Package installation failed. You may need to install packages manually.${NC}"
         fi
     fi
 
-    echo -e "${GREEN}Essential packages installed${NC}"
+    if [ -n "$PKG_MGR" ]; then
+        # Try to install neovim from package manager
+        echo "Installing neovim..."
+        if sudo $PKG_MGR install -y neovim 2>/dev/null; then
+            echo -e "${GREEN}Neovim installed from package manager${NC}"
+        else
+            echo -e "${YELLOW}Neovim not available in repos, installing from AppImage...${NC}"
+            # Install neovim via AppImage as fallback
+            if [ ! -f "$HOME/.local/bin/nvim" ]; then
+                mkdir -p "$HOME/.local/bin"
+                curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim.appimage
+                chmod u+x nvim.appimage
+                mv nvim.appimage "$HOME/.local/bin/nvim"
+                echo -e "${GREEN}Neovim installed via AppImage to ~/.local/bin/nvim${NC}"
+            else
+                echo -e "${GREEN}Neovim already installed at ~/.local/bin/nvim${NC}"
+            fi
+        fi
+
+        echo -e "${GREEN}Package installation complete${NC}"
+    fi
 elif [ "$DISTRO" = "ubuntu" ] || [ "$DISTRO" = "debian" ]; then
     # Debian-based systems (apt)
     echo -e "${YELLOW}Installing essential packages via apt...${NC}"
+
+    echo "Updating package lists..."
     sudo apt-get update
+
+    echo "Installing essential packages..."
     sudo apt-get install -y \
         git \
         curl \
@@ -114,11 +138,15 @@ elif [ "$DISTRO" = "ubuntu" ] || [ "$DISTRO" = "debian" ]; then
         python3-pip \
         libssl-dev \
         libbz2-dev \
-        libffi-dev \
-        || true
+        libffi-dev
+
+    if [ $? -ne 0 ]; then
+        echo -e "${RED}Package installation failed. You may need to install packages manually.${NC}"
+    fi
 
     # Try to install neovim from package manager
-    if sudo apt-get install -y neovim; then
+    echo "Installing neovim..."
+    if sudo apt-get install -y neovim 2>/dev/null; then
         echo -e "${GREEN}Neovim installed from package manager${NC}"
     else
         echo -e "${YELLOW}Neovim not available in repos, installing from AppImage...${NC}"
@@ -128,11 +156,13 @@ elif [ "$DISTRO" = "ubuntu" ] || [ "$DISTRO" = "debian" ]; then
             curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim.appimage
             chmod u+x nvim.appimage
             mv nvim.appimage "$HOME/.local/bin/nvim"
-            echo -e "${GREEN}Neovim installed via AppImage${NC}"
+            echo -e "${GREEN}Neovim installed via AppImage to ~/.local/bin/nvim${NC}"
+        else
+            echo -e "${GREEN}Neovim already installed at ~/.local/bin/nvim${NC}"
         fi
     fi
 
-    echo -e "${GREEN}Essential packages installed${NC}"
+    echo -e "${GREEN}Package installation complete${NC}"
 else
     echo -e "${YELLOW}Unknown Linux distribution. Skipping package installation.${NC}"
     echo -e "${YELLOW}Please ensure git, curl, zsh, tmux, and neovim are installed manually.${NC}"
