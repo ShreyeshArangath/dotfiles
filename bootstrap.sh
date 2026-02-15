@@ -74,7 +74,6 @@ elif [ "$DISTRO" = "rhel" ] || [ "$DISTRO" = "centos" ] || [ "$DISTRO" = "fedora
         wget \
         zsh \
         tmux \
-        neovim \
         gcc \
         make \
         python3 \
@@ -83,6 +82,21 @@ elif [ "$DISTRO" = "rhel" ] || [ "$DISTRO" = "centos" ] || [ "$DISTRO" = "fedora
         bzip2-devel \
         libffi-devel \
         || true
+
+    # Try to install neovim from package manager
+    if sudo $PKG_MGR install -y neovim; then
+        echo -e "${GREEN}Neovim installed from package manager${NC}"
+    else
+        echo -e "${YELLOW}Neovim not available in repos, installing from AppImage...${NC}"
+        # Install neovim via AppImage as fallback
+        if [ ! -f "$HOME/.local/bin/nvim" ]; then
+            mkdir -p "$HOME/.local/bin"
+            curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim.appimage
+            chmod u+x nvim.appimage
+            mv nvim.appimage "$HOME/.local/bin/nvim"
+            echo -e "${GREEN}Neovim installed via AppImage${NC}"
+        fi
+    fi
 
     echo -e "${GREEN}Essential packages installed${NC}"
 elif [ "$DISTRO" = "ubuntu" ] || [ "$DISTRO" = "debian" ]; then
@@ -95,7 +109,6 @@ elif [ "$DISTRO" = "ubuntu" ] || [ "$DISTRO" = "debian" ]; then
         wget \
         zsh \
         tmux \
-        neovim \
         build-essential \
         python3 \
         python3-pip \
@@ -103,6 +116,21 @@ elif [ "$DISTRO" = "ubuntu" ] || [ "$DISTRO" = "debian" ]; then
         libbz2-dev \
         libffi-dev \
         || true
+
+    # Try to install neovim from package manager
+    if sudo apt-get install -y neovim; then
+        echo -e "${GREEN}Neovim installed from package manager${NC}"
+    else
+        echo -e "${YELLOW}Neovim not available in repos, installing from AppImage...${NC}"
+        # Install neovim via AppImage as fallback
+        if [ ! -f "$HOME/.local/bin/nvim" ]; then
+            mkdir -p "$HOME/.local/bin"
+            curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim.appimage
+            chmod u+x nvim.appimage
+            mv nvim.appimage "$HOME/.local/bin/nvim"
+            echo -e "${GREEN}Neovim installed via AppImage${NC}"
+        fi
+    fi
 
     echo -e "${GREEN}Essential packages installed${NC}"
 else
