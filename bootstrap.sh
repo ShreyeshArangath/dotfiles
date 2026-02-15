@@ -119,6 +119,29 @@ echo ""
 echo -e "${YELLOW}Initializing Dotbot submodule...${NC}"
 git submodule update --init --recursive
 
+# Backup and remove existing config files that should be symlinked
+echo ""
+echo -e "${YELLOW}Preparing config files for symlinking...${NC}"
+BACKUP_DIR="$HOME/.dotfiles_backup_$(date +%Y%m%d_%H%M%S)"
+
+for config_file in "$HOME/.zshrc" "$HOME/.gitconfig" "$HOME/.tmux.conf"; do
+    if [ -f "$config_file" ] && [ ! -L "$config_file" ]; then
+        echo "Backing up existing $(basename $config_file) to $BACKUP_DIR"
+        mkdir -p "$BACKUP_DIR"
+        mv "$config_file" "$BACKUP_DIR/"
+    fi
+done
+
+if [ -d "$HOME/.config/nvim" ] && [ ! -L "$HOME/.config/nvim" ]; then
+    echo "Backing up existing nvim config to $BACKUP_DIR"
+    mkdir -p "$BACKUP_DIR"
+    mv "$HOME/.config/nvim" "$BACKUP_DIR/"
+fi
+
+if [ -d "$BACKUP_DIR" ]; then
+    echo -e "${GREEN}Existing configs backed up to: $BACKUP_DIR${NC}"
+fi
+
 # Run Dotbot
 echo ""
 echo -e "${YELLOW}Running Dotbot configuration...${NC}"
@@ -129,6 +152,19 @@ echo -e "${GREEN}=========================================="
 echo "  Bootstrap Complete!"
 echo "==========================================${NC}"
 echo ""
+
+# Reload tmux config if tmux is running
+if command -v tmux &> /dev/null && tmux list-sessions &> /dev/null; then
+    echo -e "${YELLOW}Reloading tmux configuration...${NC}"
+    tmux source-file ~/.tmux.conf && echo -e "${GREEN}Tmux config reloaded!${NC}" || echo -e "${YELLOW}Could not reload tmux. Please restart tmux to see changes.${NC}"
+fi
+
+echo ""
 echo "Your development environment is now set up."
 echo "Please check the post-installation instructions above."
 echo ""
+
+if [ -d "$BACKUP_DIR" ]; then
+    echo -e "${YELLOW}Note: Your old configs were backed up to: $BACKUP_DIR${NC}"
+    echo ""
+fi
