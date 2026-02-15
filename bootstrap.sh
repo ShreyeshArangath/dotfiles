@@ -50,6 +50,59 @@ if [ "$DISTRO" = "macos" ]; then
     else
         echo -e "${GREEN}Homebrew is already installed.${NC}"
     fi
+elif [ "$DISTRO" = "mariner" ]; then
+    # CBL-Mariner (Microsoft's Linux distro, used by LinkedIn)
+    echo -e "${YELLOW}Installing essential packages via tdnf (Mariner)...${NC}"
+
+    if command -v tdnf &> /dev/null; then
+        PKG_MGR="tdnf"
+        echo "Using tdnf package manager (CBL-Mariner)"
+    else
+        echo -e "${RED}Error: tdnf not found on this system${NC}"
+        echo -e "${YELLOW}Please install packages manually: git curl wget zsh tmux${NC}"
+        PKG_MGR=""
+    fi
+
+    if [ -n "$PKG_MGR" ]; then
+        echo "Installing essential packages..."
+        sudo $PKG_MGR install -y \
+            git \
+            curl \
+            wget \
+            zsh \
+            tmux \
+            gcc \
+            make \
+            python3 \
+            python3-pip \
+            openssl-devel \
+            tar \
+            gzip
+
+        if [ $? -ne 0 ]; then
+            echo -e "${RED}Package installation failed. You may need to install packages manually.${NC}"
+        fi
+
+        # Try to install neovim from package manager
+        echo "Installing neovim..."
+        if sudo $PKG_MGR install -y neovim 2>/dev/null; then
+            echo -e "${GREEN}Neovim installed from package manager${NC}"
+        else
+            echo -e "${YELLOW}Neovim not available in repos, installing from AppImage...${NC}"
+            # Install neovim via AppImage as fallback
+            if [ ! -f "$HOME/.local/bin/nvim" ]; then
+                mkdir -p "$HOME/.local/bin"
+                curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim.appimage
+                chmod u+x nvim.appimage
+                mv nvim.appimage "$HOME/.local/bin/nvim"
+                echo -e "${GREEN}Neovim installed via AppImage to ~/.local/bin/nvim${NC}"
+            else
+                echo -e "${GREEN}Neovim already installed at ~/.local/bin/nvim${NC}"
+            fi
+        fi
+
+        echo -e "${GREEN}Package installation complete${NC}"
+    fi
 elif [ "$DISTRO" = "rhel" ] || [ "$DISTRO" = "centos" ] || [ "$DISTRO" = "fedora" ] || [ "$DISTRO" = "amzn" ]; then
     # RHEL-based systems (yum/dnf)
     echo -e "${YELLOW}Installing essential packages via yum/dnf...${NC}"
