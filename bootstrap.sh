@@ -285,6 +285,13 @@ if command -v tmux &> /dev/null; then
         echo -e "${GREEN}TPM is already installed.${NC}"
     fi
 
+    # Clean old plugins (excluding tpm itself) to avoid stale cache from theme switches
+    echo -e "${YELLOW}Cleaning old tmux plugins...${NC}"
+    for dir in "$HOME/.tmux/plugins"/*/; do
+        [ "$(basename "$dir")" = "tpm" ] && continue
+        rm -rf "$dir"
+    done
+
     # Install tmux plugins non-interactively
     echo -e "${YELLOW}Installing tmux plugins...${NC}"
     "$TPM_DIR/bin/install_plugins" && echo -e "${GREEN}Tmux plugins installed!${NC}" || echo -e "${YELLOW}Could not install tmux plugins. Run prefix + I inside tmux to install manually.${NC}"
