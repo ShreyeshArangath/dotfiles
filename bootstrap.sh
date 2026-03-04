@@ -274,6 +274,22 @@ echo "  Bootstrap Complete!"
 echo "==========================================${NC}"
 echo ""
 
+# Install TPM (Tmux Plugin Manager) and plugins
+if command -v tmux &> /dev/null; then
+    TPM_DIR="$HOME/.tmux/plugins/tpm"
+    if [ ! -d "$TPM_DIR" ]; then
+        echo -e "${YELLOW}Installing Tmux Plugin Manager (TPM)...${NC}"
+        git clone https://github.com/tmux-plugins/tpm "$TPM_DIR"
+        echo -e "${GREEN}TPM installed!${NC}"
+    else
+        echo -e "${GREEN}TPM is already installed.${NC}"
+    fi
+
+    # Install tmux plugins non-interactively
+    echo -e "${YELLOW}Installing tmux plugins...${NC}"
+    "$TPM_DIR/bin/install_plugins" && echo -e "${GREEN}Tmux plugins installed!${NC}" || echo -e "${YELLOW}Could not install tmux plugins. Run prefix + I inside tmux to install manually.${NC}"
+fi
+
 # Reload tmux config if tmux is running
 if command -v tmux &> /dev/null && tmux list-sessions &> /dev/null; then
     echo -e "${YELLOW}Reloading tmux configuration...${NC}"
