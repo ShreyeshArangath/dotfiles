@@ -10,12 +10,21 @@
     - ~/.zsh
     - ~/.local/bin
     - ~/.cache
+    - ~/.claude/skills
+    - ~/.claude/hooks
 
 - link:
     ~/.zshrc: zsh/.zshrc
     ~/.gitconfig: git/.gitconfig
     ~/.tmux.conf: tmux/.tmux.conf
     ~/.config/nvim: nvim
+
+    # Claude Code - custom skills and hooks (non-LinkedIn, non-plugin)
+    ~/.claude/CLAUDE.md: claude/CLAUDE.md
+    ~/.claude/skills/code-review: claude/skills/code-review
+    ~/.claude/skills/worktree-manager: claude/skills/worktree-manager
+    ~/.claude/hooks/notify-on-stop.py: claude/hooks/notify-on-stop.py
+    ~/.claude/claude-logo.png: claude/claude-logo.png
 
 - shell:
     - description: Installing platform-specific packages

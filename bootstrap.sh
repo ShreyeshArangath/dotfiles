@@ -259,6 +259,27 @@ if [ -d "$HOME/.config/nvim" ] && [ ! -L "$HOME/.config/nvim" ]; then
     BACKED_UP=true
 fi
 
+# Backup existing Claude Code config files before symlinking
+for claude_file in "$HOME/.claude/CLAUDE.md" "$HOME/.claude/claude-logo.png" "$HOME/.claude/hooks/notify-on-stop.py"; do
+    if [ -f "$claude_file" ] && [ ! -L "$claude_file" ]; then
+        claude_backup="$BACKUP_DIR/claude"
+        echo "Backing up existing $(basename $claude_file) to $claude_backup"
+        mkdir -p "$claude_backup"
+        mv "$claude_file" "$claude_backup/"
+        BACKED_UP=true
+    fi
+done
+
+for claude_dir in "$HOME/.claude/skills/code-review" "$HOME/.claude/skills/worktree-manager"; do
+    if [ -d "$claude_dir" ] && [ ! -L "$claude_dir" ]; then
+        claude_backup="$BACKUP_DIR/claude/skills"
+        echo "Backing up existing $(basename $claude_dir) to $claude_backup"
+        mkdir -p "$claude_backup"
+        mv "$claude_dir" "$claude_backup/"
+        BACKED_UP=true
+    fi
+done
+
 if [ "$BACKED_UP" = true ]; then
     echo -e "${GREEN}Existing configs backed up to: $BACKUP_DIR${NC}"
 fi
