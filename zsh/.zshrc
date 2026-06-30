@@ -108,6 +108,7 @@ alias vi="nvim"
 alias vim="nvim"
 alias notify="terminal-notifier -sound default -ignoreDnD"
 alias claudinho="claude --dangerously-skip-permissions --model opus"
+alias copium="copilot --autopilot"
 
 # ========================================
 # Profiling (uncomment for debugging slow shell startup)
