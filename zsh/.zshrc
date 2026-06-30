@@ -101,6 +101,13 @@ if [[ $- == *i* ]]; then
   }
 fi
 
+work_ssh() {
+    ssh-add -D
+    local ssh_add_arg=""
+    [[ "$(uname)" = "Darwin" ]] && ssh_add_arg="--apple-use-keychain"
+    ssh-add $ssh_add_arg ~/.ssh/sarangat_at_linkedin.com_ssh_key
+ }
+
 # ========================================
 # Aliases
 # ========================================
@@ -129,3 +136,17 @@ alias copium="copilot --autopilot"
 # ========================================
 # Added by Windsurf
 export PATH="/Users/sarangat/.codeium/windsurf/bin:$PATH"
+
+# bun completions
+[ -s "/home/sarangat/.bun/_bun" ] && source "/home/sarangat/.bun/_bun"
+
+# bun
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
+
+export NVM_DIR="$HOME/.config/nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+# opencode
+export PATH=/home/sarangat/.opencode/bin:$PATH
