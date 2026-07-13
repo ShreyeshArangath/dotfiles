@@ -1,0 +1,21 @@
+{
+  "model": "auto",
+  "theme": "default",
+  "experimental": true,
+  "footer": {
+    "showModelEffort": true,
+    "showDirectory": false,
+    "showBranch": true,
+    "showContextWindow": true,
+    "showQuota": false,
+    "showAiUsed": true,
+    "showAgent": true,
+    "showCodeChanges": false,
+    "showUsername": false,
+    "showSandbox": false,
+    "showYolo": true,
+    "showCiStatus": false,
+    "showPullRequest": true,
+    "showCustom": true
+  }
+}

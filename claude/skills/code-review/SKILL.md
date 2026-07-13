@@ -1,7 +1,7 @@
 ---
 name: code-review
 description: >
-  This skill should be used when the user asks to "review this code", "review my changes",
+  Use this skill when the user asks to "review this code", "review my changes",
   "review this PR", "code review", "audit this code", "check my diff", "find bugs in my changes",
   "review before merge", or pastes code and asks for feedback. Orchestrates 4 parallel subagents
   to provide a comprehensive code review covering correctness, style, distributed systems, and UX.
@@ -41,7 +41,7 @@ Before launching subagents, collect context they need:
 
 ## Step 3: Launch 4 Subagents in Parallel
 
-Launch all 4 agents in a **single response** using the Agent tool so they run concurrently. **Use `subagent_type: "general-purpose"`** for all agents (do NOT use custom subagent_type values — they don't exist and will cause agents to silently fail with 0 tool uses).
+Launch all 4 agents in a **single response** using the Task tool so they run concurrently. **Use `agent_type: "general-purpose"`** for all agents (do NOT use custom values — invalid agent types will fail).
 
 Each agent's prompt MUST include:
 - Its **persona and focus area** (described below)

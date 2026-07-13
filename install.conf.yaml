@@ -12,6 +12,8 @@
     - ~/.cache
     - ~/.claude/skills
     - ~/.claude/hooks
+    - ~/.copilot
+    - ~/.copilot/skills
 
 - link:
     ~/.zshrc: zsh/.zshrc
@@ -26,7 +28,34 @@
     ~/.claude/hooks/notify-on-stop.py: claude/hooks/notify-on-stop.py
     ~/.claude/claude-logo.png: claude/claude-logo.png
 
+    # GitHub Copilot CLI - personal skills (non-LinkedIn, safe to publish)
+    # Settings are seeded (not symlinked) by a shell step below so Copilot's
+    # own writes never land in this public repo.
+    ~/.copilot/skills/humanizer: copilot/skills/humanizer
+
 - shell:
+    - description: Seeding GitHub Copilot CLI personal settings
+      command: |
+        mkdir -p "$HOME/.copilot"
+        # Seed personal defaults only if the user has no settings yet.
+        # Never clobber: Copilot manages this file at runtime and it may
+        # hold machine- or work-specific settings we must not overwrite.
+        if [ ! -e "$HOME/.copilot/settings.json" ]; then
+          cp copilot/settings.json "$HOME/.copilot/settings.json"
+          echo "Seeded ~/.copilot/settings.json from personal defaults"
+        else
+          echo "~/.copilot/settings.json already present; left unchanged"
+        fi
+        # Work machines: if the gitignored LinkedIn config is present locally,
+        # remind how to enable it (kept out of this public repo on purpose).
+        if [ -f copilot/settings.linkedin.json ]; then
+          echo "LinkedIn Copilot config found. To enable it on a work machine:"
+          echo "  cp copilot/settings.linkedin.json ~/.copilot/settings.json"
+          echo "  cp copilot/mcp-config.linkedin.json ~/.copilot/mcp-config.json"
+        fi
+      stdout: true
+      stderr: true
+
     - description: Installing platform-specific packages
       command: |
         OS="$(uname -s)"

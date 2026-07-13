@@ -82,6 +82,11 @@ EOF
 # Enable LinkedIn git configuration
 cp ~/dotfiles/git/.gitconfig.linkedin ~/.gitconfig.local
 
+# Enable LinkedIn GitHub Copilot CLI configuration (files are kept locally,
+# gitignored, and never pushed to this public repo)
+cp ~/dotfiles/copilot/settings.linkedin.json ~/.copilot/settings.json
+cp ~/dotfiles/copilot/mcp-config.linkedin.json ~/.copilot/mcp-config.json
+
 # Reload shell
 source ~/.zshrc
 ```
@@ -106,6 +111,12 @@ dotfiles/
 ├── zsh/
 │   ├── .zshrc               # Personal/shared zsh config
 │   └── .zshrc.linkedin      # Work zsh config (copy to ~/.zshrc.local)
+├── claude/                  # Claude Code config (CLAUDE.md, skills, hooks)
+├── copilot/                 # GitHub Copilot CLI config
+│   ├── settings.json            # Personal settings (model, theme, footer)
+│   ├── settings.linkedin.json   # Work settings (gitignored, not published)
+│   ├── mcp-config.linkedin.json # Work MCP servers (gitignored, not published)
+│   └── skills/                  # Personal Copilot skills (e.g. humanizer)
 ├── dotbot/                  # Dotbot submodule (symlink manager)
 ├── Brewfile                 # Homebrew packages
 ├── bootstrap.sh             # Main installation script
@@ -205,6 +216,33 @@ Based on [kickstart.nvim](https://github.com/nvim-lua/kickstart.nvim) with:
 - Git integration (fugitive, gitsigns)
 - Auto-completion
 - Custom plugins and keybindings
+
+### GitHub Copilot CLI
+
+Config lives in `~/.copilot/`. Because this repo is **public**, only personal,
+non-sensitive settings are committed; secrets and LinkedIn-internal config are
+never checked in (same personal/work split used for zsh and git above).
+
+**Committed (personal, safe to publish):**
+- `copilot/settings.json` — model, theme, experimental flag, and footer/status-line
+  preferences. Seeded to `~/.copilot/settings.json` on first bootstrap and never
+  overwrites an existing file (Copilot manages that file at runtime).
+- `copilot/skills/humanizer/` — a personal skill, symlinked to
+  `~/.copilot/skills/humanizer` so it is available in every repo.
+
+**Not committed (gitignored):**
+- `~/.copilot/config.json` — holds your OAuth token and machine state.
+- `copilot/settings.linkedin.json` / `copilot/mcp-config.linkedin.json` — LinkedIn
+  work-machine settings and MCP servers (internal plugins, marketplaces, and
+  internal MCP tooling).
+  Apply these only on work machines (see [Work Machine Setup](#work-machine-setup)).
+
+**First-time setup:** run `copilot`, then `/login` to authenticate. Your token is
+saved to `~/.copilot/config.json` and is never committed.
+
+**Add a personal skill:** create `copilot/skills/<name>/SKILL.md`, add a link line to
+`install.conf.yaml` (`~/.copilot/skills/<name>: copilot/skills/<name>`), then re-run
+`./bootstrap.sh`.
 
 ## SSH Key Management
 

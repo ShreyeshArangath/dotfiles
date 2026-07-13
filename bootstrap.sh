@@ -280,6 +280,17 @@ for claude_dir in "$HOME/.claude/skills/code-review" "$HOME/.claude/skills/workt
     fi
 done
 
+# Backup existing Copilot CLI skill dirs before symlinking
+for copilot_dir in "$HOME/.copilot/skills/humanizer"; do
+    if [ -d "$copilot_dir" ] && [ ! -L "$copilot_dir" ]; then
+        copilot_backup="$BACKUP_DIR/copilot/skills"
+        echo "Backing up existing $(basename $copilot_dir) to $copilot_backup"
+        mkdir -p "$copilot_backup"
+        mv "$copilot_dir" "$copilot_backup/"
+        BACKED_UP=true
+    fi
+done
+
 if [ "$BACKED_UP" = true ]; then
     echo -e "${GREEN}Existing configs backed up to: $BACKUP_DIR${NC}"
 fi

@@ -1,2 +1,16 @@
+# Work-specific configs (not committed to this public repo)
 zsh/.zshrc.linkedin
-.claude/logs/
+
+# GitHub Copilot CLI - never commit secrets, tokens, machine state,
+# or LinkedIn-internal config to this public repo.
+copilot/config.json
+copilot/mcp-config.json
+copilot/*.linkedin.json
+copilot/logs/
+copilot/session-state/
+copilot/session-store.db*
+copilot/**/*.log
+
+# AI-tool runtime artifacts created when running Copilot/Claude inside this repo
+.claude/
+.copilot/
