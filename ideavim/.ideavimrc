@@ -1,6 +1,3 @@
-"" ========================================================
-"" Base Settings
-"" ========================================================
 set scrolloff=10
 set history=1000
 set relativenumber number
@@ -10,49 +7,28 @@ set smartcase
 set incsearch
 set hlsearch
 set visualbell
-
-" Clipboard Integration
 set clipboard+=unnamed
-
-" Leader Key
 let mapleader="\<space>"
-
-"Default Behavior
 set gdefault
-
-" iIdeaVim Specific Settings
 set ideajoin
 set ideamarks
 set idearefactormode=normal
 set ideastatusicon=gray
-
-
-"" ========================================================
-"" Plugin Settings
-"" ========================================================
 set exchange
 set commentary
 set ReplaceWithRegister
 set surround
 set nerdtree
-
-" Searching Plugins
 set sneak
 set easymotion
 let g:EasyMotion_override_acejump = 0
-
-" Highlighting Plugins
 set highlightedyank
 set quickscope
 let g:qs_highlight_on_keys = ['f', 'F', 't', 'T']
-
-" Object Plugins
 set textobj-entire
 set indent-object
 set argtextobj
 let g:argtextobj_pairs="[:],(:),<:>"
-
-" Which-key settings
 set which-key
 let g:WhichKey_FontSize = 20
 let g:WhichKey_PrefixColor = "#a403fe"
@@ -61,49 +37,22 @@ let g:WhichKey_PrefixStyle = "bold"
 let g:WhichKey_KeyStyle = "italic"
 let g:WhichKey_SortOrder = "by_key_prefix_first"
 let g:WhichKey_ShowTypedSequence = "false"
-
-
-"" ========================================================
-"" Key Mappings
-"" ========================================================
-" Tab navigation
 nmap <C-p> <Action>(PreviousTab)
 nmap <C-n> <Action>(NextTab)
-
-" Pane navigation
 nnoremap <C-h> <C-w>h
 nnoremap <C-l> <C-w>l
 nnoremap <C-k> <C-w>k
 nnoremap <C-j> <C-w>j
-
-" Navigation actions
 nmap <C-o> <Action>(Back)
 nmap <C-i> <Action>(Forward)
-
-" Jump between methods
 nmap [[ <Action>(MethodUp)
 nmap ]] <Action>(MethodDown)
-
-" Visual indentation
 vnoremap < <gv
 vnoremap > >gv
-
-" IDE interaction
 nmap <C-m> <Action>(ShowPopupMenu)
 nmap <C-S-m> <Action>(ToolWindowsGroup)
-
-" Clear Search Highlighitng
 nnoremap <C-[> :noh<return>
-
-
-"" ========================================================
-"" Leader Commands
-"" ========================================================
-
-" EasyMotion
 let g:WhichKeyDesc_easymotion = "<leader><leader> EasyMotion"
-
-" Information commands
 nmap <leader>ie <action>(ShowErrorDescription)
 nmap <leader>it <action>(ExpressionTypeInfo)
 nmap <leader>ip <action>(ParameterInfo)
@@ -123,9 +72,6 @@ let g:WhichKeyDesc_info_uml_diagram = "<leader>iU UML Diagram"
 let g:WhichKeyDesc_info_call_hierarchy = "<leader>ih Call Hierarchy"
 let g:WhichKeyDesc_info_show_usages = "<leader>iu Usages"
 let g:WhichKeyDesc_info_method_hierarchy = "<leader>im Method Hierarchy"
-
-
-" Window splits
 nmap <leader>wv <action>(SplitVertically)
 nmap <leader>wh <action>(SplitHorizontally)
 nmap <leader>wu <action>(Unsplit)
@@ -139,9 +85,6 @@ let g:WhichKeyDesc_window_split_unsplit = "<leader>wu Unsplit"
 let g:WhichKeyDesc_window_split_move_editor = "<leader>wm Move editor to opposite tab group"
 let g:WhichKeyDesc_window_split_back = "<leader>wb Back split"
 let g:WhichKeyDesc_window_split_forward = "<leader>wf Forward split"
-
-
-" Tab Navigation and Management
 nmap <leader>tP <Action>(PinActiveEditorTab)
 nmap <leader>tg1 <Action>(GoToTab1)
 nmap <leader>tg2 <Action>(GoToTab2)
@@ -172,10 +115,6 @@ let g:WhichKeyDesc_tabs_close = "<leader>tx Close Current Tab"
 let g:WhichKeyDesc_tabs_close_all = "<leader>tX Close All Tabs"
 let g:WhichKeyDesc_tabs_close_all_but_active = "<leader>to Close All Tabs But Active"
 let g:WhichKeyDesc_tabs_close_all_unpinned = "<leader>ta Close All Unpinned Tabs"
-
-
-
-" Display options
 map <leader>Dd <action>(ToggleDistractionFreeMode)
 map <leader>z <action>(ToggleZenMode)
 map <leader>Df <action>(ToggleFullScreen)
@@ -183,9 +122,6 @@ let g:WhichKeyDesc_display = "<leader>D Display options"
 let g:WhichKeyDesc_zen_mode = "<leader>Dz Toggle Zen mode"
 let g:WhichKeyDesc_df_mode = "<leader>Dd Toggle Distraction-Free mode"
 let g:WhichKeyDesc_fullscreen = "<leader>Df Toggle full screen"
-
-
-" File navigation
 nmap <leader>fg <Action>(GotoFile)
 nmap <leader>fr <Action>(RecentFiles)
 nmap <leader>ff <Action>(FindInPath)
@@ -212,9 +148,6 @@ let g:WhichKeyDesc_file_opt_history = "<leader>fh Show Local History"
 let g:WhichKeyDesc_file_opt_show_path = "<leader>ff Show File Path"
 let g:WhichKeyDesc_file_opt_select_in = "<leader>fi Select In"
 let g:WhichKeyDesc_file_opt_replace_in_path = "<leader>fp Replace In Path"
-
-
-" Run Actions
 nmap <leader>rm <action>(RunMenu)
 nmap <leader>rn <action>(RunClass)
 nmap <leader>rc <Action>(ContextRun)
@@ -232,9 +165,6 @@ let g:WhichKeyDesc_run_tests = "<leader>rt Run Tests"
 let g:WhichKeyDesc_run_failed = "<leader>rf Rerun Failed Tests"
 let g:WhichKeyDesc_run_stop = "<leader>rs Stop"
 let g:WhichKeyDesc_run_choose_configuration = "<leader>rC Choose Run Configuration"
-
-
-" Debugging commands
 nmap <leader>dx <Action>(Debug)
 nmap <leader>dc <Action>(ContextDebug)
 nmap <leader>dv <Action>(ViewBreakpoints)
@@ -260,9 +190,6 @@ let g:WhichKeyDesc_debug_step_over = "<leader>do Step Over"
 let g:WhichKeyDesc_debug_resume = "<leader>dr Resume Debugging"
 let g:WhichKeyDesc_debug_evaluate_expression = "<leader>dR Evaluate Expression"
 let g:WhichKeyDesc_debug_activate_tool_window = "<leader>dt Activate Debug Tool Window"
-
-
-" Language Actions
 nmap <leader>ll <Action>(Refactorings.QuickListPopupAction)
 nmap <leader>lr <Action>(RenameElement)
 nmap <leader>lc <Action>(ChangeSignature)
@@ -293,9 +220,6 @@ let g:WhichKeyDesc_language_show_intention_actions = "<leader>la Show Intention 
 let g:WhichKeyDesc_language_reformat_code = "<leader>lR Reformat Code"
 let g:WhichKeyDesc_language_inspect_code = "<leader>lI Inspect Code"
 let g:WhichKeyDesc_language_generate = "<leader>lG Generate"
-
-
-""" Bookmarks
 nmap <leader>bm <Action>(Bookmarks)
 nmap <leader>bs <Action>(ShowBookmarks)
 nmap <leader>bt <Action>(ActivateBookmarksToolWindow)
@@ -311,9 +235,6 @@ let g:WhichKeyDesc_bookmarks_toggle_bookmark = "<leader>bb Toggle Bookmark"
 let g:WhichKeyDesc_bookmarks_edit = "<leader>be Edit Bookmark"
 let g:WhichKeyDesc_bookmarks_prev = "<leader>bp Previous Bookmark"
 let g:WhichKeyDesc_bookmarks_next = "<leader>bn Next Bookmark"
-
-
-" Go To
 nmap <leader>gd <Action>(GotoDeclaration)
 nmap <leader>go <Action>(GotoSuperMethod)
 nmap <leader>gD <Action>(GotoTypeDeclaration)
@@ -325,9 +246,6 @@ let g:WhichKeyDesc_goto_super_method = "<leader>go Go To Super Method"
 let g:WhichKeyDesc_goto_type_declaration = "<leader>gD Go To Type Declaration"
 let g:WhichKeyDesc_goto_implementation = "<leader>gi Go To Implementation"
 let g:WhichKeyDesc_goto_test = "<leader>gT Go To Test"
-
-
-" Search
 nmap <leader>ss <action>(SearchEverywhere)
 nmap <leader>su <Action>(FindUsages)
 nmap <leader>sn <Action>(ShowNavBar)

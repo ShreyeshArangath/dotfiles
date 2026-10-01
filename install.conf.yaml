@@ -3,17 +3,9 @@
       relink: true
       create: true
 
-- clean: ['~']
-
 - create:
-    - ~/.config
     - ~/.zsh
-    - ~/.local/bin
     - ~/.cache
-    - ~/.claude/skills
-    - ~/.claude/hooks
-    - ~/.copilot
-    - ~/.copilot/skills
 
 - link:
     ~/.zshrc: zsh/.zshrc
@@ -35,11 +27,11 @@
       path: karabiner/karabiner.json
       if: '[ "$(uname -s)" = Darwin ]'
 
-    # Agent instructions - single tool-agnostic source of truth (AGENTS.md semantics).
-    # Symlinked into each agent's global config path so Claude, Codex, and Copilot
-    # all read the same file. Add ~/.codex/AGENTS.md etc. here to extend to more tools.
+    # Shared instructions; Copilot is opt-in.
     ~/.claude/CLAUDE.md: claude/AGENTS.md
-    ~/.copilot/copilot-instructions.md: claude/AGENTS.md
+    ~/.copilot/copilot-instructions.md:
+      path: claude/AGENTS.md
+      if: '[ "${DOTFILES_WITH_COPILOT:-0}" = 1 ]'
 
     # Claude Code - personal skills and hooks
     ~/.claude/skills/code-review: claude/skills/code-review
@@ -47,10 +39,9 @@
     ~/.claude/hooks/notify-on-stop.py: claude/hooks/notify-on-stop.py
     ~/.claude/claude-logo.png: claude/claude-logo.png
 
-    # GitHub Copilot CLI - personal skills
-    # Settings are seeded (not symlinked) by a shell step below so Copilot's
-    # own writes never land in this public repo.
-    ~/.copilot/skills/humanizer: copilot/skills/humanizer
+    ~/.copilot/skills/humanizer:
+      path: copilot/skills/humanizer
+      if: '[ "${DOTFILES_WITH_COPILOT:-0}" = 1 ]'
     # url-forwarder - VM browser auth via SSH reverse tunnel (see url-forwarder/README.md)
     ~/.local/bin/url-listener:           url-forwarder/bin/url-listener
     ~/.local/bin/url-forwarder-register: url-forwarder/bin/url-forwarder-register
@@ -58,21 +49,6 @@
     ~/.local/bin/xdg-open:               url-forwarder/bin/xdg-open
 
 - shell:
-    - description: Seeding GitHub Copilot CLI personal settings
-      command: |
-        mkdir -p "$HOME/.copilot"
-        # Seed personal defaults only if the user has no settings yet.
-        # Never clobber: Copilot manages this file at runtime and it may
-        # hold machine- or work-specific settings we must not overwrite.
-        if [ ! -e "$HOME/.copilot/settings.json" ]; then
-          cp copilot/settings.json "$HOME/.copilot/settings.json"
-          echo "Seeded ~/.copilot/settings.json from personal defaults"
-        else
-          echo "~/.copilot/settings.json already present; left unchanged"
-        fi
-      stdout: true
-      stderr: true
-
     - description: Installing platform-specific packages
       command: |
         OS="$(uname -s)"
@@ -169,24 +145,3 @@
         fi
       stdout: true
       stderr: true
-
-- shell:
-    - description: Post-installation instructions
-      command: |
-        echo ""
-        echo "=========================================="
-        echo "  Dotfiles Installation Complete!"
-        echo "=========================================="
-        echo ""
-        echo "Next steps:"
-        echo "  1. Change shell to zsh: chsh -s \$(which zsh)"
-        echo "  2. Restart your terminal or run: zsh"
-        echo "  3. Open Neovim and run :Lazy sync to install plugins"
-        echo "  4. Open tmux - plugins are already installed!"
-        echo ""
-        echo "For workplace-specific settings, use ~/.zshrc.local and ~/.gitconfig.local."
-        echo ""
-        echo "SSH key management:"
-        echo "  - personal_ssh  : Load personal SSH key"
-        echo ""
-      stdout: true

@@ -2,12 +2,15 @@
 set -euo pipefail
 
 LINKS_ONLY=false
+export DOTFILES_WITH_COPILOT=0
 for argument in "$@"; do
     case "$argument" in
         --links-only) LINKS_ONLY=true ;;
+        --with-copilot) DOTFILES_WITH_COPILOT=1 ;;
         -h|--help)
-            echo "Usage: ./bootstrap.sh [--links-only]"
+            echo "Usage: ./bootstrap.sh [--links-only] [--with-copilot]"
             echo "  --links-only  Restore configs without installing packages or plugins."
+            echo "  --with-copilot  Include Copilot configs (skipped by default)."
             exit 0
             ;;
         *)
@@ -78,6 +81,9 @@ for relative_path in \
     .local/bin/url-listener .local/bin/url-forwarder-register \
     .local/bin/open-on-host .local/bin/xdg-open; do
     case "$relative_path" in
+        .copilot/*)
+            [ "$DOTFILES_WITH_COPILOT" = 1 ] || continue
+            ;;
         .config/karabiner/*|Library/*)
             [ "$OS" = Darwin ] || continue
             ;;
@@ -103,7 +109,7 @@ fi
 "$DOTFILES_DIR/dotbot/bin/dotbot" -d "$DOTFILES_DIR" -c "$DOTFILES_DIR/install.conf.yaml" \
     --only "${directives[@]}"
 
-if [ ! -e "$HOME/.copilot/settings.json" ]; then
+if [ "$DOTFILES_WITH_COPILOT" = 1 ] && [ ! -e "$HOME/.copilot/settings.json" ]; then
     mkdir -p "$HOME/.copilot"
     cp "$DOTFILES_DIR/copilot/settings.json" "$HOME/.copilot/settings.json"
 fi

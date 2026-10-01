@@ -14,10 +14,9 @@ cd ~/dotfiles
 ./bootstrap.sh
 ```
 
-The full setup installs Homebrew packages on macOS, or essential packages using
-apt, dnf, or yum on Linux. It also installs the configured shell and tmux plugins.
-Only run it where those dependencies are approved. Package and plugin installation
-requires internet access; Linux package installation requires sudo.
+Full setup installs Homebrew packages on macOS, or essential packages through
+apt/dnf/yum on Linux, plus shell and tmux plugins. Use it only where those
+dependencies are approved; installation needs internet access and sudo on Linux.
 
 To restore configs without installing packages or plugins:
 
@@ -30,6 +29,15 @@ regular files and config directories are moved into a unique directory under
 `~/.dotfiles_backup/`, preserving older backups. Re-running setup refreshes symlinks.
 It does not overwrite `~/.zshrc.local`, `~/.gitconfig.local`, or existing Copilot settings.
 It does not change your default shell or restart any running terminal sessions.
+
+**Copilot is skipped by default.** Neither mode creates, backs up, links, or changes
+Copilot files unless you explicitly opt in:
+
+```bash
+./bootstrap.sh --links-only --with-copilot
+```
+
+Opt-in copies personal settings only if `~/.copilot/settings.json` is absent.
 
 After setup:
 
@@ -52,7 +60,7 @@ After setup:
 | `ghostty/` | Shift+Enter and macOS window preferences |
 | `karabiner/` | macOS keyboard remapping |
 | `claude/` | Shared agent instructions, personal skills, notification hook |
-| `copilot/` | Personal UI/model defaults and the humanizer skill |
+| `copilot/` | Optional personal defaults and humanizer skill (`--with-copilot`) |
 | `url-forwarder/` | Browser forwarding from an SSH-connected VM |
 
 Herdr logs, sockets, session snapshots, plugin registries, and saved workspaces
@@ -60,10 +68,9 @@ stay local. Herdr's memory/disk status commands and Ghostty's window preferences
 are macOS-specific; adjust them if restoring those apps on another OS.
 Karabiner and Ghostty's native macOS config path are linked only on macOS.
 
-`claude/AGENTS.md` is the shared source for both `~/.claude/CLAUDE.md` and
-`~/.copilot/copilot-instructions.md`. Copilot settings are copied only when
-`~/.copilot/settings.json` does not exist, so runtime writes don't land in this repo.
-The configured model may require account access; choose an available model if needed.
+`claude/AGENTS.md` supplies Claude's global instructions and, when opted in,
+Copilot's instructions. Run `p10k configure` to regenerate the prompt config with
+the wizard's full comments.
 
 ## Keep workplace settings local
 
@@ -105,10 +112,6 @@ git status --short
 git diff
 ```
 
-Copilot settings are not symlinked. Copy only the personal settings you want to
-share into `copilot/settings.json`; omit hooks tied to local paths, credentials,
-marketplaces, and workplace integrations.
-
 To add a config, add its file and a link in `install.conf.yaml`, then include its
 installed path in the backup list in `bootstrap.sh`. Use a platform condition for
 OS-specific destinations.
@@ -121,7 +124,7 @@ bash -n bootstrap.sh
 zsh -n zsh/.zshrc
 ```
 
-Setup tests use temporary homes and block package installers. They cover config
-links, backup preservation, repeated setup, and local overrides.
+Tests use temporary homes and block installers. They cover config links, preserved
+backups and overrides, platform conditions, and Copilot opt-in.
 
 See [url-forwarder/README.md](url-forwarder/README.md) for VM browser forwarding.

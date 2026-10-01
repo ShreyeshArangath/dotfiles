@@ -50,7 +50,6 @@ class SetupTests(unittest.TestCase):
             ".config/ghostty/config": "ghostty/config",
             ".config/git/ignore": "git/ignore",
             ".claude/CLAUDE.md": "claude/AGENTS.md",
-            ".copilot/copilot-instructions.md": "claude/AGENTS.md",
         }
         for destination, source in expected.items():
             with self.subTest(destination=destination):
@@ -60,6 +59,36 @@ class SetupTests(unittest.TestCase):
         self.assertEqual((self.home / ".config/herdr/config.toml").read_bytes(),
                          (ROOT / "herdr/config.toml").read_bytes())
         self.assertFalse((self.home / ".config/herdr/session.json").exists())
+        self.assertFalse((self.home / ".copilot").exists())
+
+    def test_copilot_opt_in_restores_its_configs(self):
+        self.assert_success(self.setup_configs("--with-copilot"))
+        instructions = self.home / ".copilot/copilot-instructions.md"
+        self.assertEqual(instructions.resolve(), ROOT / "claude/AGENTS.md")
+        skill = self.home / ".copilot/skills/humanizer"
+        self.assertEqual(skill.resolve(), ROOT / "copilot/skills/humanizer")
+        self.assertEqual((self.home / ".copilot/settings.json").read_bytes(),
+                         (ROOT / "copilot/settings.json").read_bytes())
+
+    def test_default_setup_leaves_existing_copilot_files_untouched(self):
+        instructions = self.home / ".copilot/copilot-instructions.md"
+        skill = self.home / ".copilot/skills/humanizer/SKILL.md"
+        instructions.parent.mkdir()
+        instructions.write_text("my instructions\n")
+        skill.parent.mkdir(parents=True)
+        skill.write_text("my skill\n")
+        self.assert_success(self.setup_configs())
+        self.assertFalse(instructions.is_symlink())
+        self.assertEqual(instructions.read_text(), "my instructions\n")
+        self.assertEqual(skill.read_text(), "my skill\n")
+        self.assertFalse((self.home / ".copilot/settings.json").exists())
+
+    def test_copilot_opt_in_preserves_existing_settings(self):
+        settings = self.home / ".copilot/settings.json"
+        settings.parent.mkdir()
+        settings.write_text('{"model": "my-model"}\n')
+        self.assert_success(self.setup_configs("--with-copilot"))
+        self.assertEqual(settings.read_text(), '{"model": "my-model"}\n')
 
     def test_existing_configs_and_old_backups_survive_repeat_setup(self):
         old_backup = self.home / ".dotfiles_backup" / "old"
