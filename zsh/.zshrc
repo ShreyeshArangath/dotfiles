@@ -22,9 +22,6 @@ export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
 # System paths
 export PATH="/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:$PATH"
 
-# LinkedIn paths (work machines)
-export PATH="/usr/local/linkedin/bin:/export/content/linkedin/bin:/export/content/granular/bin:$PATH"
-
 # User local binaries
 export PATH="$HOME/.local/bin:$PATH"
 
@@ -33,6 +30,15 @@ export PATH="$HOME/.cargo/bin:$PATH"
 
 # Tools
 export PATH="$HOME/tools/kubectl-plugins:$PATH"
+
+# ========================================
+# url-forwarder (SSH sessions only)
+# ========================================
+# Route browser opens back to the host Mac via the reverse SSH tunnel.
+# Only set inside SSH sessions so local Mac shells are untouched.
+if [ -n "${SSH_CONNECTION-}" ] && [ -x "$HOME/.local/bin/open-on-host" ]; then
+  export BROWSER="$HOME/.local/bin/open-on-host"
+fi
 
 # ========================================
 # Zsh Configuration
@@ -69,10 +75,9 @@ compinit
 [[ -r ~/.p10k.zsh ]] && source ~/.p10k.zsh
 
 # ========================================
-# Zsh Plugins
+# Zsh Autosuggestions
 # ========================================
 [[ -r ~/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh ]] && source ~/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
-[[ -r ~/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]] && source ~/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 # ========================================
 # Development Tools
@@ -83,6 +88,43 @@ export PATH="$VOLTA_HOME/bin:$PATH"
 
 # Go
 export PATH="$PATH:/usr/local/go/bin"
+
+# NVM
+export NVM_DIR="$HOME/.nvm"
+[[ -d "$NVM_DIR" ]] || export NVM_DIR="$XDG_CONFIG_HOME/nvm"
+[[ -s "$NVM_DIR/nvm.sh" ]] && source "$NVM_DIR/nvm.sh"
+[[ -s "$NVM_DIR/bash_completion" ]] && source "$NVM_DIR/bash_completion"
+
+# Bun
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
+[[ -s "$BUN_INSTALL/_bun" ]] && source "$BUN_INSTALL/_bun"
+
+# Other locally installed tools
+export PATH="$HOME/.opencode/bin:$HOME/.codeium/windsurf/bin:$PATH"
+[[ -f "$HOME/.local/bin/env" ]] && source "$HOME/.local/bin/env"
+[[ -d "/Applications/IntelliJ IDEA.app/Contents/MacOS" ]] && export PATH="/Applications/IntelliJ IDEA.app/Contents/MacOS:$PATH"
+
+# Java version switching (macOS)
+use_java() {
+  if [[ $# -ne 1 ]] || [[ ! -x /usr/libexec/java_home ]]; then
+    echo "Usage: use_java <version> (requires macOS java_home)" >&2
+    return 1
+  fi
+  local java_home
+  java_home="$(/usr/libexec/java_home -v "$1")" || return 1
+  if [[ ! -x "$java_home/bin/java" ]]; then
+    echo "Java executable not found in: $java_home" >&2
+    return 1
+  fi
+  export JAVA_HOME="$java_home"
+  export PATH="$JAVA_HOME/bin:$PATH"
+  "$JAVA_HOME/bin/java" -version
+}
+use_java_21() { use_java 21; }
+use_java_17() { use_java 17; }
+use_java_11() { use_java 11; }
+use_java_8() { use_java 1.8; }
 
 # Android SDK (commented out per user preference)
 # export PATH="$HOME/Library/Android/sdk/tools:$PATH"
@@ -101,13 +143,6 @@ if [[ $- == *i* ]]; then
   }
 fi
 
-work_ssh() {
-    ssh-add -D
-    local ssh_add_arg=""
-    [[ "$(uname)" = "Darwin" ]] && ssh_add_arg="--apple-use-keychain"
-    ssh-add $ssh_add_arg ~/.ssh/sarangat_at_linkedin.com_ssh_key
- }
-
 # ========================================
 # Aliases
 # ========================================
@@ -116,6 +151,8 @@ alias vim="nvim"
 alias notify="terminal-notifier -sound default -ignoreDnD"
 alias claudinho="claude --dangerously-skip-permissions --model opus"
 alias copium="copilot --autopilot"
+alias kayfabe-dev="$HOME/personal/kayfabe/target/debug/kayfabe"
+alias kayfabe-dev-build="cargo build --manifest-path $HOME/personal/kayfabe/Cargo.toml"
 
 # ========================================
 # Profiling (uncomment for debugging slow shell startup)
@@ -128,25 +165,9 @@ alias copium="copilot --autopilot"
 # Source .zshrc.local for machine-specific configurations
 [[ -f ~/.zshrc.local ]] && source ~/.zshrc.local
 
-# Source .zshrc.linkedin for work-specific configurations (on LinkedIn machines)
-[[ -f ~/.zshrc.linkedin ]] && source ~/.zshrc.linkedin
+typeset -U path
 
-# ========================================
-# Tool-Specific Additions (auto-generated)
-# ========================================
-# Added by Windsurf
-export PATH="/Users/sarangat/.codeium/windsurf/bin:$PATH"
-
-# bun completions
-[ -s "/home/sarangat/.bun/_bun" ] && source "/home/sarangat/.bun/_bun"
-
-# bun
-export BUN_INSTALL="$HOME/.bun"
-export PATH="$BUN_INSTALL/bin:$PATH"
-
-export NVM_DIR="$HOME/.config/nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-
-# opencode
-export PATH=/home/sarangat/.opencode/bin:$PATH
+# Keep syntax highlighting after widgets, aliases, and local overrides.
+if [[ -r ~/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]]; then
+  source ~/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+fi

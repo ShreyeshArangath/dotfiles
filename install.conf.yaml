@@ -17,21 +17,45 @@
 
 - link:
     ~/.zshrc: zsh/.zshrc
+    ~/.zprofile: zsh/.zprofile
+    ~/.profile: zsh/.profile
+    ~/.p10k.zsh: zsh/.p10k.zsh
     ~/.gitconfig: git/.gitconfig
+    ~/.config/git/ignore: git/ignore
     ~/.tmux.conf: tmux/.tmux.conf
     ~/.config/nvim: nvim
+    ~/.ideavimrc: ideavim/.ideavimrc
+    ~/.config/herdr/config.toml: herdr/config.toml
+    ~/.config/herdr/sounds/silent.mp3: herdr/sounds/silent.mp3
+    ~/.config/ghostty/config: ghostty/config
+    ~/Library/Application Support/com.mitchellh.ghostty/config:
+      path: ghostty/config
+      if: '[ "$(uname -s)" = Darwin ]'
+    ~/.config/karabiner/karabiner.json:
+      path: karabiner/karabiner.json
+      if: '[ "$(uname -s)" = Darwin ]'
 
-    # Claude Code - custom skills and hooks (non-LinkedIn, non-plugin)
-    ~/.claude/CLAUDE.md: claude/CLAUDE.md
+    # Agent instructions - single tool-agnostic source of truth (AGENTS.md semantics).
+    # Symlinked into each agent's global config path so Claude, Codex, and Copilot
+    # all read the same file. Add ~/.codex/AGENTS.md etc. here to extend to more tools.
+    ~/.claude/CLAUDE.md: claude/AGENTS.md
+    ~/.copilot/copilot-instructions.md: claude/AGENTS.md
+
+    # Claude Code - personal skills and hooks
     ~/.claude/skills/code-review: claude/skills/code-review
     ~/.claude/skills/worktree-manager: claude/skills/worktree-manager
     ~/.claude/hooks/notify-on-stop.py: claude/hooks/notify-on-stop.py
     ~/.claude/claude-logo.png: claude/claude-logo.png
 
-    # GitHub Copilot CLI - personal skills (non-LinkedIn, safe to publish)
+    # GitHub Copilot CLI - personal skills
     # Settings are seeded (not symlinked) by a shell step below so Copilot's
     # own writes never land in this public repo.
     ~/.copilot/skills/humanizer: copilot/skills/humanizer
+    # url-forwarder - VM browser auth via SSH reverse tunnel (see url-forwarder/README.md)
+    ~/.local/bin/url-listener:           url-forwarder/bin/url-listener
+    ~/.local/bin/url-forwarder-register: url-forwarder/bin/url-forwarder-register
+    ~/.local/bin/open-on-host:           url-forwarder/bin/open-on-host
+    ~/.local/bin/xdg-open:               url-forwarder/bin/xdg-open
 
 - shell:
     - description: Seeding GitHub Copilot CLI personal settings
@@ -46,13 +70,6 @@
         else
           echo "~/.copilot/settings.json already present; left unchanged"
         fi
-        # Work machines: if the gitignored LinkedIn config is present locally,
-        # remind how to enable it (kept out of this public repo on purpose).
-        if [ -f copilot/settings.linkedin.json ]; then
-          echo "LinkedIn Copilot config found. To enable it on a work machine:"
-          echo "  cp copilot/settings.linkedin.json ~/.copilot/settings.json"
-          echo "  cp copilot/mcp-config.linkedin.json ~/.copilot/mcp-config.json"
-        fi
       stdout: true
       stderr: true
 
@@ -64,7 +81,7 @@
             # macOS - use Homebrew
             if command -v brew >/dev/null 2>&1; then
               echo "Installing packages from Brewfile..."
-              brew bundle --file=Brewfile || true
+              brew bundle --file=Brewfile
             else
               echo "Homebrew not found. Skipping macOS package installation."
             fi
@@ -117,6 +134,7 @@
 
     - description: Installing Tmux Plugin Manager (TPM)
       command: |
+        set -e
         if [ ! -d "$HOME/.tmux/plugins/tpm" ]; then
           echo "Installing Tmux Plugin Manager..."
           git clone https://github.com/tmux-plugins/tpm "$HOME/.tmux/plugins/tpm"
@@ -129,6 +147,7 @@
 
     - description: Installing Tmux plugins
       command: |
+        set -e
         echo "Installing tmux plugins..."
         if [ -f "$HOME/.tmux/plugins/tpm/bin/install_plugins" ]; then
           # Set TMUX_PLUGIN_MANAGER_PATH for TPM
@@ -137,20 +156,16 @@
           # Run TPM's install script
           bash "$HOME/.tmux/plugins/tpm/bin/install_plugins"
 
-          # Verify plugins were installed
-          if [ -d "$HOME/.tmux/plugins/tmux" ]; then
-            echo "Catppuccin theme installed successfully"
-          else
-            echo "Warning: Catppuccin theme may not have installed correctly"
-          fi
-
-          if [ -d "$HOME/.tmux/plugins/tmux-yank" ]; then
-            echo "tmux-yank installed successfully"
-          else
-            echo "Warning: tmux-yank may not have installed correctly"
-          fi
+          for plugin in tmux tmux-yank tmux-resurrect tmux-continuum; do
+            if [ ! -d "$HOME/.tmux/plugins/$plugin" ]; then
+              echo "Error: tmux plugin missing after installation: $plugin" >&2
+              exit 1
+            fi
+            echo "$plugin installed successfully"
+          done
         else
-          echo "TPM not found, skipping plugin installation"
+          echo "Error: TPM installer not found. Check ~/.tmux/plugins/tpm." >&2
+          exit 1
         fi
       stdout: true
       stderr: true
@@ -169,14 +184,9 @@
         echo "  3. Open Neovim and run :Lazy sync to install plugins"
         echo "  4. Open tmux - plugins are already installed!"
         echo ""
-        echo "For LinkedIn work machines:"
-        echo "  1. Create ~/.zshrc.local with your work-specific configurations"
-        echo "  2. Run: cp ~/dotfiles/git/.gitconfig.linkedin ~/.gitconfig.local"
-        echo "  3. Restart your terminal"
+        echo "For workplace-specific settings, use ~/.zshrc.local and ~/.gitconfig.local."
         echo ""
         echo "SSH key management:"
         echo "  - personal_ssh  : Load personal SSH key"
-        echo "  - work_ssh      : Load LinkedIn SSH key (work machines)"
-        echo "  - reload_ssh_keys : Load both keys (work machines)"
         echo ""
       stdout: true

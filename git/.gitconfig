@@ -1,6 +1,6 @@
 [user]
-	name = sarangat_LinkedIn
-	email = sarangath@linkedin.com
+	name = Shreyesh Shaju Arangath
+	email = shreyesharangath@gmail.com
 [core]
 	editor = nvim
 [filter "lfs"]
@@ -10,11 +10,9 @@
 	required = true
 [include]
 	path = ~/.gitconfig.local
-[safe]
-	directory = 
 [credential "https://github.com"]
 	helper = 
-	helper = !/usr/bin/gh auth git-credential
+	helper = !gh auth git-credential
 [credential "https://gist.github.com"]
 	helper = 
-	helper = !/usr/bin/gh auth git-credential
+	helper = !gh auth git-credential

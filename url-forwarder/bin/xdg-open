@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# VM-side PATH shim. Tools that call `xdg-open` directly (instead of $BROWSER)
+# land here. Forwards to the Mac via the url-listener tunnel.
+exec "$(dirname "$0")/open-on-host" "$@"

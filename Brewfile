@@ -39,3 +39,7 @@ brew "terminal-notifier"  # macOS notifications from terminal
 # ========================================
 cask "font-fira-code-nerd-font"
 cask "font-jetbrains-mono-nerd-font"
+
+# macOS terminal and keyboard settings tracked in this repository
+cask "ghostty"
+cask "karabiner-elements"

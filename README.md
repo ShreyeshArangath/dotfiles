@@ -1,406 +1,127 @@
 # Dotfiles
 
-Personal development environment configuration managed with [Dotbot](https://github.com/anishathalye/dotbot). This repository provides a complete, reproducible development environment setup that works across personal and work machines (macOS and Linux).
+Personal macOS and Linux configs managed with [Dotbot](https://github.com/anishathalye/dotbot).
+No employer credentials, SSH host registrations, or agent session data belong here.
 
-## Quick Start
+## Set up a new device
+
+Install Git and Python 3.7+ first. On macOS, also install
+[Homebrew](https://brew.sh) using a method approved for that device.
 
 ```bash
-git clone https://github.com/yourusername/dotfiles.git ~/dotfiles
+git clone --recurse-submodules https://github.com/ShreyeshArangath/dotfiles.git ~/dotfiles
 cd ~/dotfiles
 ./bootstrap.sh
 ```
 
-That's it! The script will:
-- **macOS**: Install Homebrew (if not present) and packages from Brewfile
-- **Linux**: Install essential packages via yum/dnf (RHEL/CentOS/Fedora/Amazon Linux/Mariner) or apt (Ubuntu/Debian)
-- Backup existing config files (if any) to `~/.dotfiles_backup/` (overwrites previous backup)
-- Install zsh plugins (autosuggestions, syntax-highlighting)
-- Create all configuration symlinks
-- Set up Tmux Plugin Manager and install plugins (tmux-yank, Catppuccin theme)
-- Reload tmux configuration if tmux is running
+The full setup installs Homebrew packages on macOS, or essential packages using
+apt, dnf, or yum on Linux. It also installs the configured shell and tmux plugins.
+Only run it where those dependencies are approved. Package and plugin installation
+requires internet access; Linux package installation requires sudo.
 
-### Supported Platforms
-
-- **macOS**: Intel (x86_64) and Apple Silicon (arm64/M1/M2/M3)
-- **Linux**:
-  - RHEL-based (yum/dnf)
-  - CBL-Mariner (yum)
-  - Debian-based (apt)
-
-## Post-Installation Steps
-
-After running the bootstrap script:
-
-1. **Change your default shell to zsh**:
-   ```bash
-   chsh -s $(which zsh)
-   # Then logout/login or run: zsh
-   ```
-
-2. **Install Neovim plugins**:
-   ```bash
-   nvim
-   # In Neovim, plugins will auto-install on first launch
-   # Or manually run: :Lazy sync
-   ```
-
-3. **Tmux is ready to use**:
-   - Plugins are automatically installed (tmux-yank, Catppuccin theme)
-   - Just run `tmux` to start
-   - See Tmux section below for key bindings
-
-## Work Machine Setup
-
-For LinkedIn work machines, enable work-specific configurations:
+To restore configs without installing packages or plugins:
 
 ```bash
-# Create work-specific zsh configuration
-cat > ~/.zshrc.local << 'EOF'
-# LinkedIn paths
-export PATH="/usr/local/linkedin/bin:/export/content/linkedin/bin:/export/content/granular/bin:$PATH"
-
-# Java for LinkedIn
-export JAVA_HOME="/Library/Java/JavaVirtualMachines/jdk1.8.0_172.jdk/Contents/Home/"
-export PATH="$JAVA_HOME/bin:$PATH"
-
-# Kubernetes environment
-export K8S_LDAP_GROUP=cop-dev
-export NAMESPACE=cop-dev
-
-# Work SSH helper
-if [[ $- == *i* ]]; then
-  work_ssh() {
-    ssh-add -D
-    local ssh_add_arg=""
-    [[ "$(uname)" = "Darwin" ]] && ssh_add_arg="--apple-use-keychain"
-    ssh-add $ssh_add_arg ~/.ssh/sarangat_at_linkedin.com_ssh_key
-    echo "Loaded LinkedIn SSH key"
-  }
-fi
-EOF
-
-# Enable LinkedIn git configuration
-cp ~/dotfiles/git/.gitconfig.linkedin ~/.gitconfig.local
-
-# Enable LinkedIn GitHub Copilot CLI configuration (files are kept locally,
-# gitignored, and never pushed to this public repo)
-cp ~/dotfiles/copilot/settings.linkedin.json ~/.copilot/settings.json
-cp ~/dotfiles/copilot/mcp-config.linkedin.json ~/.copilot/mcp-config.json
-
-# Reload shell
-source ~/.zshrc
+./bootstrap.sh --links-only
 ```
 
-This approach ensures:
-- The repository stays personal by default
-- Work configs are not committed to the repository
-- Easy context switching between personal and work environments
+Config-only setup needs Python and the initialized Dotbot submodules. Existing
+regular files and config directories are moved into a unique directory under
+`~/.dotfiles_backup/`, preserving older backups. Re-running setup refreshes symlinks.
+It does not overwrite `~/.zshrc.local`, `~/.gitconfig.local`, or existing Copilot settings.
+It does not change your default shell or restart any running terminal sessions.
 
-## Directory Structure
+After setup:
 
-```
-dotfiles/
-├── git/
-│   ├── .gitconfig            # Personal git config
-│   └── .gitconfig.linkedin   # Work git config (copy to ~/.gitconfig.local)
-├── nvim/                     # Neovim configuration (kickstart.nvim based)
-│   ├── init.lua
-│   └── lua/
-├── tmux/
-│   └── .tmux.conf           # Tmux configuration
-├── zsh/
-│   ├── .zshrc               # Personal/shared zsh config
-│   └── .zshrc.linkedin      # Work zsh config (copy to ~/.zshrc.local)
-├── claude/                  # Claude Code config (CLAUDE.md, skills, hooks)
-├── copilot/                 # GitHub Copilot CLI config
-│   ├── settings.json            # Personal settings (model, theme, footer)
-│   ├── settings.linkedin.json   # Work settings (gitignored, not published)
-│   ├── mcp-config.linkedin.json # Work MCP servers (gitignored, not published)
-│   └── skills/                  # Personal Copilot skills (e.g. humanizer)
-├── dotbot/                  # Dotbot submodule (symlink manager)
-├── Brewfile                 # Homebrew packages
-├── bootstrap.sh             # Main installation script
-├── install.conf.yaml        # Dotbot configuration
-└── README.md
-```
+- Restart your shell. If wanted, select zsh with `chsh -s "$(command -v zsh)"`.
+- Open Neovim to install its configured plugins.
+- Install Herdr through an approved source, then reload its config or restart it.
+  Its binary and plugins are not installed by this repo.
+- On macOS, grant Karabiner-Elements the permissions it requests.
 
-## Configuration Details
+## What's tracked
 
-### Zsh
+| Directory | Configs |
+|---|---|
+| `zsh/` | Shell config, login paths, Powerlevel10k prompt |
+| `git/` | Personal identity, portable GitHub credential helper, global ignore rules |
+| `tmux/` | Vim navigation, Dracula theme, resurrect/continuum session settings |
+| `nvim/` | LazyVim setup, plugins, keymaps, SSH clipboard settings |
+| `ideavim/` | IdeaVim options and IDE keymaps |
+| `herdr/` | Theme, navigation, agent restore preferences, silent notification sound |
+| `ghostty/` | Shift+Enter and macOS window preferences |
+| `karabiner/` | macOS keyboard remapping |
+| `claude/` | Shared agent instructions, personal skills, notification hook |
+| `copilot/` | Personal UI/model defaults and the humanizer skill |
+| `url-forwarder/` | Browser forwarding from an SSH-connected VM |
 
-**Personal Configuration (`.zshrc`):**
-- XDG Base Directory setup
-- Homebrew, Volta, Go, Rust paths
-- Simple git-aware prompt with branch info
-- History configuration (shared across sessions)
-- Zsh plugins (installed to `~/.config/zsh/plugins/`):
-  - `zsh-autosuggestions` - Command suggestions based on history
-  - `zsh-syntax-highlighting` - Syntax highlighting as you type
-- Personal SSH key management (`personal_ssh()`)
-- Aliases: `vi`/`vim` → `nvim`
+Herdr logs, sockets, session snapshots, plugin registries, and saved workspaces
+stay local. Herdr's memory/disk status commands and Ghostty's window preferences
+are macOS-specific; adjust them if restoring those apps on another OS.
+Karabiner and Ghostty's native macOS config path are linked only on macOS.
 
-**Work Configuration (`.zshrc.linkedin`):**
-- LinkedIn paths
-- Java 1.8 setup
-- Kubernetes environment variables
-- Work SSH functions (`work_ssh()`, `reload_ssh_keys()`)
+`claude/AGENTS.md` is the shared source for both `~/.claude/CLAUDE.md` and
+`~/.copilot/copilot-instructions.md`. Copilot settings are copied only when
+`~/.copilot/settings.json` does not exist, so runtime writes don't land in this repo.
+The configured model may require account access; choose an available model if needed.
 
-### Git
+## Keep workplace settings local
 
-**Personal Configuration (`.gitconfig`):**
-- User: shreyesharangath@gmail.com
-- Editor: nvim
-- Git LFS support
-- Includes `.gitconfig.local` for machine-specific overrides
+Shell settings go in `~/.zshrc.local`, which is sourced after the shared config.
+For example, put the workplace's PATH entries or JAVA_HOME there rather than
+changing the shared config. The Java helpers `use_java_8`, `use_java_11`,
+`use_java_17`, and `use_java_21` use macOS's installed JDK registry.
+No Java version is forced during shell startup.
 
-**Work Configuration (`.gitconfig.linkedin`):**
-- User: sarangath@linkedin.com
-- Copy to `~/.gitconfig.local` on work machines
+Git includes `~/.gitconfig.local` for identity overrides:
 
-### Tmux
-
-**Features:**
-- Vim-style pane navigation (prefix + h/j/k/l)
-- Alt navigation without prefix (Alt + h/j/k/l)
-- Catppuccin Mocha theme (warm pastel colors)
-- TPM integration with auto-installed plugins
-- Mouse support enabled
-- Vi mode for copy/paste
-
-**Key Bindings:**
-
-*Pane Navigation:*
-- `prefix + h/j/k/l` - Navigate panes (vim-style)
-- `Alt + h/j/k/l` - Navigate panes (no prefix needed)
-- `Alt + H/J/K/L` - Resize panes
-
-*Window Management:*
-- `Alt + 1-5` - Jump to window 1-5
-- `Alt + n/p` - Next/previous window
-- `Alt + Tab` - Last window
-- `prefix + c` - Create new window (prompts for name)
-- `prefix + |` - Split horizontally
-- `prefix + -` - Split vertically
-
-*Session Management:*
-- `Alt + [/]` - Switch between sessions
-- `prefix + S` - Session tree chooser
-- `prefix + N` - Create new session (prompts for name)
-- `prefix + R` - Rename current session
-
-*Copy Mode (vi-style):*
-- `prefix + [` - Enter copy mode
-- `v` - Begin selection
-- `y` - Yank and exit
-- `Y` - Yank without exiting
-- `Ctrl-u/d` - Half-page scroll
-
-*Other:*
-- `prefix + r` - Reload tmux config
-
-**Plugins:**
-- [TPM](https://github.com/tmux-plugins/tpm) - Plugin manager
-- [tmux-yank](https://github.com/tmux-plugins/tmux-yank) - Better clipboard integration
-- [Catppuccin](https://github.com/catppuccin/tmux) - Warm pastel color scheme (Mocha variant)
-
-**Note for macOS users:** To use Alt navigation, configure your terminal:
-- **iTerm2**: Preferences → Profiles → Keys → Set left/right option key to "Esc+"
-- **Terminal.app**: Enable "Use Option as Meta key" in preferences
-
-### Neovim
-
-Based on [kickstart.nvim](https://github.com/nvim-lua/kickstart.nvim) with:
-- LSP support
-- Tree-sitter syntax highlighting
-- Telescope fuzzy finder
-- Git integration (fugitive, gitsigns)
-- Auto-completion
-- Custom plugins and keybindings
-
-### GitHub Copilot CLI
-
-Config lives in `~/.copilot/`. Because this repo is **public**, only personal,
-non-sensitive settings are committed; secrets and LinkedIn-internal config are
-never checked in (same personal/work split used for zsh and git above).
-
-**Committed (personal, safe to publish):**
-- `copilot/settings.json` — model, theme, experimental flag, and footer/status-line
-  preferences. Seeded to `~/.copilot/settings.json` on first bootstrap and never
-  overwrites an existing file (Copilot manages that file at runtime).
-- `copilot/skills/humanizer/` — a personal skill, symlinked to
-  `~/.copilot/skills/humanizer` so it is available in every repo.
-
-**Not committed (gitignored):**
-- `~/.copilot/config.json` — holds your OAuth token and machine state.
-- `copilot/settings.linkedin.json` / `copilot/mcp-config.linkedin.json` — LinkedIn
-  work-machine settings and MCP servers (internal plugins, marketplaces, and
-  internal MCP tooling).
-  Apply these only on work machines (see [Work Machine Setup](#work-machine-setup)).
-
-**First-time setup:** run `copilot`, then `/login` to authenticate. Your token is
-saved to `~/.copilot/config.json` and is never committed.
-
-**Add a personal skill:** create `copilot/skills/<name>/SKILL.md`, add a link line to
-`install.conf.yaml` (`~/.copilot/skills/<name>: copilot/skills/<name>`), then re-run
-`./bootstrap.sh`.
-
-## SSH Key Management
-
-Helper functions for managing SSH keys:
-
-**Personal Machines:**
-```bash
-personal_ssh  # Load personal SSH key only
+```gitconfig
+[user]
+    name = Your Name
+    email = your-work-email@example.com
 ```
 
-**Work Machines:**
-```bash
-work_ssh        # Load LinkedIn SSH key only
-reload_ssh_keys # Load both personal and LinkedIn keys
-```
+For different identities by repository location, put an `includeIf` rule in that
+local file instead of changing the personal defaults. Credentials, SSH keys,
+MCP connections, and employer-specific agent settings must be configured separately
+using that workplace's approved tools. Setup does not authenticate accounts.
 
-## Updating
+Local override files in the repo are ignored. Do not copy whole `~/.config`,
+`~/.claude`, or `~/.copilot` directories into the repo.
 
-To update your dotfiles:
+## Updating and capturing changes
 
 ```bash
 cd ~/dotfiles
-git pull
-./bootstrap.sh  # Re-run to update symlinks and dependencies
+git pull --ff-only
+./bootstrap.sh --links-only
 ```
 
-**Update packages:**
-
-macOS (Homebrew):
-```bash
-brew bundle --file=~/dotfiles/Brewfile
-brew upgrade
-```
-
-Linux (RHEL/CentOS/Fedora):
-```bash
-sudo yum update
-# or
-sudo dnf upgrade
-```
-
-Linux (Ubuntu/Debian):
-```bash
-sudo apt update && sudo apt upgrade
-```
-
-**Update Neovim plugins:**
-```bash
-nvim +Lazy sync
-```
-
-**Update Oh My Zsh:**
-```bash
-omz update
-```
-
-## Adding New Configurations
-
-### Add a New Package
-
-Add to `Brewfile`:
-```ruby
-brew "package-name"
-```
-
-Then run:
-```bash
-brew bundle --file=~/dotfiles/Brewfile
-```
-
-### Add a New Dotfile
-
-1. Create the file in the appropriate directory (e.g., `zsh/.my-config`)
-2. Add to `install.conf.yaml`:
-   ```yaml
-   - link:
-       ~/.my-config: zsh/.my-config
-   ```
-3. Re-run `./bootstrap.sh`
-
-## Machine-Specific Configuration
-
-For configuration that shouldn't be in the repository (secrets, machine-specific paths, etc.), use:
-
-- `~/.zshrc.local` - Sourced automatically by `.zshrc`
-- `~/.gitconfig.local` - Included automatically by `.gitconfig`
-
-These files are gitignored and won't be tracked.
-
-## Troubleshooting
-
-### Symlinks not created
+Most configs are symlinked, so edits to their installed paths update this repo.
+Before committing, inspect the diff and check for private data:
 
 ```bash
-cd ~/dotfiles
-./dotbot/bin/dotbot -d . -c install.conf.yaml -v
+git status --short
+git diff
 ```
 
-### Oh My Zsh plugins not working
+Copilot settings are not symlinked. Copy only the personal settings you want to
+share into `copilot/settings.json`; omit hooks tied to local paths, credentials,
+marketplaces, and workplace integrations.
+
+To add a config, add its file and a link in `install.conf.yaml`, then include its
+installed path in the backup list in `bootstrap.sh`. Use a platform condition for
+OS-specific destinations.
+
+## Checks
 
 ```bash
-# Reinstall plugins
-rm -rf ~/.oh-my-zsh/custom/plugins/zsh-autosuggestions
-rm -rf ~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting
-./bootstrap.sh
+python3 -m unittest discover -s tests -v
+bash -n bootstrap.sh
+zsh -n zsh/.zshrc
 ```
 
-### Neovim plugins not loading
+Setup tests use temporary homes and block package installers. They cover config
+links, backup preservation, repeated setup, and local overrides.
 
-```bash
-# Clear plugin cache and reinstall
-rm -rf ~/.local/share/nvim
-nvim +Lazy sync
-```
-
-### Tmux plugins not loading
-
-```bash
-# Reinstall TPM and plugins
-rm -rf ~/.tmux/plugins
-./bootstrap.sh
-# Plugins will be automatically installed
-```
-
-### Alt navigation not working in tmux
-
-Configure your terminal emulator:
-- **iTerm2**: Preferences → Profiles → Keys → Set left/right option key to "Esc+"
-- **Terminal.app**: Preferences → Profiles → Keyboard → Enable "Use Option as Meta key"
-
-### Homebrew not found (Apple Silicon)
-
-Add to your current shell session:
-```bash
-eval "$(/opt/homebrew/bin/brew shellenv)"
-```
-
-Then re-run the bootstrap script.
-
-## Uninstall
-
-To remove all configurations:
-
-```bash
-# Remove symlinks
-rm ~/.zshrc ~/.gitconfig ~/.tmux.conf
-rm -rf ~/.config/nvim
-
-# Remove Oh My Zsh
-rm -rf ~/.oh-my-zsh
-
-# Remove TPM
-rm -rf ~/.tmux/plugins
-
-# Optional: Remove Homebrew packages
-brew bundle cleanup --file=~/dotfiles/Brewfile --force
-```
-
-## License
-
-This repository is for personal use. Feel free to fork and customize for your own needs.
+See [url-forwarder/README.md](url-forwarder/README.md) for VM browser forwarding.

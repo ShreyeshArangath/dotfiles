@@ -1,8 +1,10 @@
 # Development Environment Configuration
 
+- Use Herdr and its Herdr skill for any terminal, pane, tab, session, or workspace manipulation. Offload all terminal-related operations to Herdr instead of using tmux directly.
+
 ## Tmux Configuration
 
-Tmux is configured with vim-style navigation and Nord theme.
+Tmux is configured with vim-style navigation and the Dracula theme.
 
 ### Key Bindings
 
@@ -47,10 +49,17 @@ git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 Press `prefix + I` to install plugins:
 - tpm - Plugin manager
 - tmux-yank - Better clipboard integration
-- nordtheme/tmux - Nord color theme
+- dracula/tmux - Dracula color theme
 
 ## Code Quality Standards
 - Write tests for new functionality
 - Follow project-specific style guides
 - Keep commits atomic and well-described
 - Ensure all tests pass before merging
+- Keep code comments short; comment only what isn't obvious from the code
+
+## Writing
+- Run the humanizer skill on any prose you write (docs, PR descriptions, commit bodies, comments)
+
+## Superpowers documentation
+- Never commit Superpowers documentation, including files under `docs/superpowers/`, unless the user explicitly requests that commit.

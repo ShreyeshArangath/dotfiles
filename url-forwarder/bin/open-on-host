@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+# VM-side: forward a URL to the Mac's url-listener over the SSH reverse tunnel.
+# The SSH host config provides:  RemoteForward 127.0.0.1:9999 127.0.0.1:9999
+#
+# Usage (matches xdg-open / $BROWSER convention):
+#   open-on-host <url>
+set -euo pipefail
+
+if [ $# -lt 1 ] || [ -z "${1:-}" ]; then
+  echo "open-on-host: missing URL" >&2
+  exit 2
+fi
+
+PORT="${URL_LISTENER_PORT:-9999}"
+
+# -s silent, -S show errors, -o discard body, -w write HTTP status to stdout.
+# We don't pass -f so we can distinguish "connection failed" from "got 4xx".
+status=$(curl -sS -o /dev/null -w '%{http_code}' --max-time 5 \
+              --data-binary "$1" "http://127.0.0.1:${PORT}/" 2>/dev/null || true)
+
+case "$status" in
+  200) exit 0 ;;
+  400)
+    echo "open-on-host: listener rejected URL (only http/https allowed): $1" >&2
+    exit 1
+    ;;
+  000)
+    cat >&2 <<EOF
+open-on-host: could not reach url-listener at 127.0.0.1:${PORT}
+
+Check:
+  - The SSH reverse tunnel is up (RemoteForward 127.0.0.1:${PORT} in your host config)
+  - The url-listener is running on your local machine
+URL: $1
+EOF
+    exit 1
+    ;;
+  *)
+    echo "open-on-host: unexpected response $status from listener for URL: $1" >&2
+    exit 1
+    ;;
+esac

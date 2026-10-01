@@ -1,0 +1,155 @@
+#!/usr/bin/env bash
+# Register a remote VM so that browser-opening CLIs running on it route URLs
+# back to this Mac's url-listener.
+#
+# Writes to ~/.ssh/url-forwarder.conf (not in the dotfiles repo — host info
+# stays local), and ensures ~/.ssh/config has `Include url-forwarder.conf`.
+#
+# Usage:
+#   url-forwarder-register <alias> <user@host>
+#   url-forwarder-register --list
+#   url-forwarder-register --remove <alias>
+#
+# Env:
+#   URL_LISTENER_PORT  (default 9999)  — reverse-forwarded for URL opens
+#   CALLBACK_PORTS     (default "8080 8000 3000") — local-forwarded for OAuth
+set -euo pipefail
+
+SSH_DIR="${HOME}/.ssh"
+CONF="${SSH_DIR}/url-forwarder.conf"
+# Prefer an existing custom SSH config; otherwise use ~/.ssh/config.
+if [ -f "${SSH_DIR}/config.custom" ] || grep -qE '^[[:space:]]*Include[[:space:]]+~?/?\.?ssh?/?config\.custom' "${SSH_DIR}/config" 2>/dev/null; then
+  INCLUDE_HOST_FILE="${SSH_DIR}/config.custom"
+else
+  INCLUDE_HOST_FILE="${SSH_DIR}/config"
+fi
+LISTENER_PORT="${URL_LISTENER_PORT:-9999}"
+CALLBACK_PORTS="${CALLBACK_PORTS:-8080 8000 3000}"
+
+usage() {
+  sed -n '2,15p' "$0" | sed 's/^# \{0,1\}//'
+  exit "${1:-0}"
+}
+
+ensure_include() {
+  mkdir -p "$SSH_DIR"
+  chmod 700 "$SSH_DIR"
+  touch "$CONF"
+  chmod 600 "$CONF"
+  if [ ! -f "$INCLUDE_HOST_FILE" ] || ! grep -qE '^[[:space:]]*Include[[:space:]]+url-forwarder\.conf' "$INCLUDE_HOST_FILE" 2>/dev/null; then
+    {
+      echo ""
+      echo "# url-forwarder: registered VMs (managed by url-forwarder-register)"
+      echo "Include url-forwarder.conf"
+    } >> "$INCLUDE_HOST_FILE"
+    chmod 600 "$INCLUDE_HOST_FILE"
+    echo "added 'Include url-forwarder.conf' to $INCLUDE_HOST_FILE"
+  fi
+}
+
+alias_exists() {
+  local alias="$1"
+  grep -qE "^Host[[:space:]]+${alias}[[:space:]]*$" "$CONF" 2>/dev/null
+}
+
+cmd_register() {
+  local alias="$1"
+  local target="$2"
+  local user host
+  if [[ "$target" == *"@"* ]]; then
+    user="${target%@*}"
+    host="${target#*@}"
+  else
+    user=""
+    host="$target"
+  fi
+
+  ensure_include
+
+  if alias_exists "$alias"; then
+    echo "error: alias '$alias' already registered in $CONF" >&2
+    echo "edit it manually or use: url-forwarder-register --remove $alias" >&2
+    exit 1
+  fi
+
+  {
+    echo ""
+    echo "# url-forwarder: $alias (added $(date -u +%Y-%m-%dT%H:%M:%SZ))"
+    echo "Host $alias"
+    echo "  HostName $host"
+    [ -n "$user" ] && echo "  User $user"
+    echo "  RemoteForward 127.0.0.1:${LISTENER_PORT} 127.0.0.1:${LISTENER_PORT}"
+    for p in $CALLBACK_PORTS; do
+      echo "  LocalForward 127.0.0.1:${p} 127.0.0.1:${p}"
+    done
+  } >> "$CONF"
+
+  echo "registered '$alias' → $target"
+  echo "  reverse: 127.0.0.1:${LISTENER_PORT} ← VM (url-listener)"
+  echo "  forward: 127.0.0.1:{${CALLBACK_PORTS// /, }} → VM (OAuth callbacks)"
+  echo ""
+  echo "next: start url-listener on this Mac, then \`ssh $alias\`"
+}
+
+cmd_list() {
+  if [ ! -s "$CONF" ]; then
+    echo "(no VMs registered)"
+    return
+  fi
+  grep -E '^Host ' "$CONF" | awk '{print $2}'
+}
+
+cmd_remove() {
+  local alias="$1"
+  if [ ! -f "$CONF" ] || ! alias_exists "$alias"; then
+    echo "error: '$alias' not found in $CONF" >&2
+    exit 1
+  fi
+  # Delete from the registration comment (if present) through end of the Host block
+  # (terminated by a blank line, EOF, or another `Host ` directive).
+  python3 - "$CONF" "$alias" <<'PY'
+import re, sys, pathlib
+path, alias = sys.argv[1], sys.argv[2]
+text = pathlib.Path(path).read_text()
+lines = text.splitlines(keepends=True)
+out, i = [], 0
+removed = False
+host_re = re.compile(rf'^Host\s+{re.escape(alias)}\s*$')
+while i < len(lines):
+    line = lines[i]
+    if host_re.match(line.rstrip()):
+        # back up past an optional preceding comment line
+        if out and out[-1].lstrip().startswith('#') and alias in out[-1]:
+            out.pop()
+        # also strip a trailing blank we added between entries
+        if out and out[-1].strip() == '':
+            out.pop()
+        # skip the Host block until next Host or blank line
+        i += 1
+        while i < len(lines) and not lines[i].lstrip().startswith('Host ') and lines[i].strip() != '':
+            i += 1
+        # consume one trailing blank if present
+        if i < len(lines) and lines[i].strip() == '':
+            i += 1
+        removed = True
+        continue
+    out.append(line)
+    i += 1
+pathlib.Path(path).write_text(''.join(out))
+sys.exit(0 if removed else 1)
+PY
+  echo "removed '$alias' from $CONF"
+}
+
+case "${1:-}" in
+  ""|-h|--help) usage 0 ;;
+  --list)       cmd_list ;;
+  --remove)
+    [ $# -eq 2 ] || usage 2
+    cmd_remove "$2"
+    ;;
+  *)
+    [ $# -eq 2 ] || usage 2
+    cmd_register "$1" "$2"
+    ;;
+esac

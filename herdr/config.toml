@@ -1,0 +1,61 @@
+onboarding = false
+[theme]
+name = "kanagawa"
+
+auto_switch = false
+[keys]
+reload_config = "prefix+r"
+resize_mode = "prefix+ctrl+r"
+
+workspace_picker = ["prefix+w", "prefix+shift+s"]
+new_workspace = "prefix+shift+n"
+rename_workspace = "prefix+shift+r"
+close_workspace = ["prefix+shift+d", "prefix+ampersand"]
+previous_workspace = "alt+["
+next_workspace = "alt+]"
+previous_agent = "alt+k"
+next_agent = "alt+j"
+
+new_tab = "prefix+c"
+previous_tab = ["prefix+p", "alt+p"]
+next_tab = ["prefix+n", "alt+n"]
+switch_tab = ["prefix+1..9", "alt+1..9"]
+goto = ["prefix+g", "alt+w"]
+
+focus_pane_left = ["prefix+h", "alt+h"]
+focus_pane_down = "prefix+j"
+focus_pane_up = "prefix+k"
+focus_pane_right = ["prefix+l", "alt+l"]
+last_pane = "alt+tab"
+
+split_vertical = ["prefix+v", "prefix+|"]
+split_horizontal = "prefix+minus"
+
+resize_pane_left = "alt+shift+h"
+resize_pane_down = "alt+shift+j"
+resize_pane_up = "alt+shift+k"
+resize_pane_right = "alt+shift+l"
+
+[ui.toast]
+delivery = "system"
+
+[ui.sound]
+enabled = true
+done_path = "sounds/silent.mp3"
+
+[experimental]
+allow_nested = true
+
+[session]
+# Resume supported agent panes in their native conversation sessions after a Herdr server restart.
+resume_agents_on_restore = true
+
+[ui]
+show_agent_labels_on_pane_borders = true
+agent_panel_sort = "priority"
+tab_bar_position = "top"
+tab_bar_right = [
+  { type = "command", command = "memory_pressure -Q 2>/dev/null | awk '/System-wide memory free percentage:/ {gsub(/%/, \"\", $5); printf \"MEM %.0f%%\", 100-$5}'", interval_seconds = 10, timeout_seconds = 2 },
+  { type = "command", command = "df -k /System/Volumes/Data | awk 'NR==2 {print \"DISK \" $5}'", interval_seconds = 10, timeout_seconds = 2 },
+]
+tab_bar_right_separator = " · "
