@@ -5,6 +5,64 @@ No employer credentials, SSH host registrations, or agent session data belong he
 
 ## Set up a new device
 
+For a lean setup using only local files and Python 3:
+
+```bash
+./bootstrap.sh --minimal
+```
+
+This installs zsh, Git, tmux, Neovim, and Ghostty **configs** without initializing
+Dotbot submodules or pulling a full plugin framework. It keeps built-in shell
+completion, Vim keybindings, prefix history search (including Herdr/tmux
+application-mode arrows), a simple prompt, and basic editor/tmux settings. It
+shallow-clones two light upstream zsh plugins into `~/.zsh/` —
+`zsh-autosuggestions` (history ghost-text) and `zsh-syntax-highlighting` — and
+skips fonts, Karabiner, agent hooks/instructions, browser forwarding, theme
+downloads, and session restoration. Pass `--skip-zsh-plugins` through
+`install-minimal.py` if you want links only. tmux and Neovim must be installed
+separately to use their configs. Git uses the personal identity below; workplace
+overrides go in `~/.gitconfig.local` / `~/.zshrc.local`. Existing configs
+(including foreign symlinks) are backed up under `~/.dotfiles_backup/minimal.*`;
+repeat runs preserve installed links. `~/.zshrc.local` is still loaded and is
+never overwritten. Other profiles below retain the full setup; `--minimal`
+cannot be combined with `--with-copilot`.
+
+To add the optional prompt and one font through Homebrew:
+
+```bash
+brew install tmux neovim powerlevel10k
+brew install --cask font-jetbrains-mono-nerd-font
+```
+
+The lean shell loads Powerlevel10k when installed, using `minimal/p10k.zsh`.
+The Ghostty config selects `JetBrainsMono Nerd Font Mono` to display its icons.
+
+To keep the lean shell and other configs but restore the full Neovim setup:
+
+```bash
+./bootstrap.sh --minimal --with-nvim
+brew install fzf fd ripgrep gh tree-sitter-cli
+nvim
+```
+
+This links `nvim/` (LazyVim, Catppuccin, Snacks, fzf-lua, Octo, and Tree-sitter).
+The bootstrap step only links configs; launching Neovim downloads its configured
+plugins and builds their dependencies. Use `--with-nvim` on subsequent lean
+bootstrap runs to keep the full config. Octo requires a separately authenticated
+GitHub CLI account for its GitHub features.
+Leave Neovim open until plugin, formatter, and parser installation finishes.
+
+To include Herdr settings and its silent notification sound as well:
+
+```bash
+./bootstrap.sh --minimal --with-nvim --with-herdr
+herdr config check
+```
+
+This only installs `config.toml` and `sounds/silent.mp3`; the Herdr binary must
+already be installed. For a running server, apply the settings with
+`herdr server reload-config`.
+
 Install Git and Python 3.7+ first. On macOS, also install
 [Homebrew](https://brew.sh) using a method approved for that device.
 
@@ -42,6 +100,11 @@ Opt-in copies personal settings only if `~/.copilot/settings.json` is absent.
 After setup:
 
 - Restart your shell. If wanted, select zsh with `chsh -s "$(command -v zsh)"`.
+- Both bootstrap profiles enable Vim-style command editing: press `Esc` for normal
+  mode, use `h`/`l`, `w`/`b`, `dw`, or `ciw`, then `i` to resume typing. Press
+  `Esc`, then `v` (or `Ctrl-X`, `Ctrl-E` while typing) to edit the command in
+  Neovim when installed, otherwise vi. Save and quit to return to the command
+  line; press Enter to run it. Run `exec zsh` to activate changes in an old shell.
 - Open Neovim to install its configured plugins.
 - Install Herdr through an approved source, then reload its config or restart it.
   Its binary and plugins are not installed by this repo.

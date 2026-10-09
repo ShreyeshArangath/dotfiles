@@ -1,0 +1,76 @@
+# Lean interactive shell: built-in zsh + two optional light plugins.
+typeset -U path
+path=("$HOME/.cargo/bin" "$HOME/.local/bin" $path)
+for brew_prefix in /opt/homebrew /usr/local; do
+  if [[ -x "$brew_prefix/bin/brew" ]]; then
+    path=("$brew_prefix/bin" "$brew_prefix/sbin" $path)
+    # rustup is keg-only; put its proxies ahead of any Homebrew rust package
+    if [[ -d "$brew_prefix/opt/rustup/bin" ]]; then
+      path=("$brew_prefix/opt/rustup/bin" $path)
+    fi
+    break
+  fi
+done
+unset brew_prefix
+
+HISTFILE="$HOME/.zsh_history"
+HISTSIZE=100000
+SAVEHIST=100000
+setopt HIST_SAVE_NO_DUPS INC_APPEND_HISTORY
+setopt AUTO_PUSHD PUSHD_IGNORE_DUPS PUSHD_SILENT AUTO_CD
+
+bindkey -v
+KEYTIMEOUT=1
+# Prefix history search. Bind CSI (\e[A) and application-mode (\eOA) arrows —
+# Herdr/tmux often send the latter.
+bindkey -M viins '\e[A' history-beginning-search-backward
+bindkey -M viins '\e[B' history-beginning-search-forward
+bindkey -M vicmd '\e[A' history-beginning-search-backward
+bindkey -M vicmd '\e[B' history-beginning-search-forward
+bindkey -M viins '\eOA' history-beginning-search-backward
+bindkey -M viins '\eOB' history-beginning-search-forward
+bindkey -M vicmd '\eOA' history-beginning-search-backward
+bindkey -M vicmd '\eOB' history-beginning-search-forward
+# Esc enters normal mode; v opens the command in the configured editor.
+export EDITOR=vi
+(( $+commands[nvim] )) && export EDITOR=nvim
+export VISUAL="$EDITOR"
+autoload -Uz edit-command-line
+zle -N edit-command-line
+bindkey -M vicmd v edit-command-line
+bindkey -M viins '^X^E' edit-command-line
+autoload -Uz compinit
+compinit
+PROMPT='%F{green}%n@%m%f %F{blue}%~%f %# '
+
+# Optional Homebrew theme; the installer itself never downloads it.
+for theme_file in /opt/homebrew/share/powerlevel10k/powerlevel10k.zsh-theme /usr/local/share/powerlevel10k/powerlevel10k.zsh-theme; do
+  if [[ -r "$theme_file" ]]; then
+    [[ -r "$HOME/.p10k.zsh" ]] && source "$HOME/.p10k.zsh"
+    source "$theme_file"
+    break
+  fi
+done
+unset theme_file
+
+if (( $+commands[nvim] )); then
+  alias vi=nvim vim=nvim
+fi
+alias gippity='codex --dangerously-bypass-approvals-and-sandbox'
+
+# Ghost-text history suggestions when the light plugin is installed.
+# History-only strategy keeps this cheap; accept with → or End.
+if [[ -r "$HOME/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh" ]]; then
+  ZSH_AUTOSUGGEST_STRATEGY=(history)
+  ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=200
+  source "$HOME/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh"
+fi
+
+[[ -r "$HOME/.zshrc.local" ]] && source "$HOME/.zshrc.local"
+
+# Syntax highlighting must load after widgets/aliases/local overrides.
+[[ -r "$HOME/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ]] && \
+  source "$HOME/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+
+# Return success even when no local override / plugins exist.
+true

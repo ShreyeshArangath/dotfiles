@@ -1,0 +1,16 @@
+[user]
+	name = Shreyesh Shaju Arangath
+	email = shreyesharangath@gmail.com
+	signingkey = /Users/sarangath/.ssh/a16z_github_1password.pub
+[core]
+	editor = vi
+	excludesFile = ~/.config/git/ignore
+[include]
+	path = ~/.gitconfig.local
+[gpg]
+	format = ssh
+[gpg "ssh"]
+	program = /Applications/1Password.app/Contents/MacOS/op-ssh-sign
+	allowedSignersFile = /Users/sarangath/.config/git/allowed_signers
+[commit]
+	gpgsign = true

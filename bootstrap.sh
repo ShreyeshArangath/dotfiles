@@ -2,13 +2,25 @@
 set -euo pipefail
 
 LINKS_ONLY=false
+MINIMAL=false
+WITH_NVIM=false
+WITH_HERDR=false
+SKIP_ZSH_PLUGINS=false
 export DOTFILES_WITH_COPILOT=0
 for argument in "$@"; do
     case "$argument" in
         --links-only) LINKS_ONLY=true ;;
+        --minimal) MINIMAL=true ;;
+        --with-nvim) WITH_NVIM=true ;;
+        --with-herdr) WITH_HERDR=true ;;
+        --skip-zsh-plugins) SKIP_ZSH_PLUGINS=true ;;
         --with-copilot) DOTFILES_WITH_COPILOT=1 ;;
         -h|--help)
-            echo "Usage: ./bootstrap.sh [--links-only] [--with-copilot]"
+            echo "Usage: ./bootstrap.sh [--minimal | --links-only] [--with-nvim] [--with-herdr] [--skip-zsh-plugins] [--with-copilot]"
+            echo "  --minimal  Install lean configs + two light zsh plugins (autosuggest/syntax)."
+            echo "  --with-nvim  Use the full Neovim config with --minimal (plugins install on launch)."
+            echo "  --with-herdr  Include Herdr settings and silent sound with --minimal."
+            echo "  --skip-zsh-plugins  With --minimal, skip cloning autosuggest/syntax plugins."
             echo "  --links-only  Restore configs without installing packages or plugins."
             echo "  --with-copilot  Include Copilot configs (skipped by default)."
             exit 0
@@ -23,6 +35,18 @@ done
 DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$DOTFILES_DIR"
 OS="$(uname -s)"
+
+if [ "$MINIMAL" = true ]; then
+    if [ "$DOTFILES_WITH_COPILOT" = 1 ]; then
+        echo "--minimal cannot be combined with --with-copilot." >&2
+        exit 2
+    fi
+    set --
+    [ "$WITH_NVIM" = false ] || set -- "$@" --with-nvim
+    [ "$WITH_HERDR" = false ] || set -- "$@" --with-herdr
+    [ "$SKIP_ZSH_PLUGINS" = false ] || set -- "$@" --skip-zsh-plugins
+    exec python3 "$DOTFILES_DIR/install-minimal.py" "$@"
+fi
 
 if [ "$LINKS_ONLY" = false ]; then
     case "$OS" in
