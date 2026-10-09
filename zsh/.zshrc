@@ -63,6 +63,14 @@ bindkey -v
 KEYTIMEOUT=1
 bindkey "\e[A" history-beginning-search-backward
 bindkey "\e[B" history-beginning-search-forward
+# Esc enters normal mode; v opens the command in the configured editor.
+export EDITOR=vi
+(( $+commands[nvim] )) && export EDITOR=nvim
+export VISUAL="$EDITOR"
+autoload -Uz edit-command-line
+zle -N edit-command-line
+bindkey -M vicmd v edit-command-line
+bindkey -M viins '^X^E' edit-command-line
 
 # Completion
 autoload -U compinit
@@ -151,6 +159,7 @@ alias vim="nvim"
 alias notify="terminal-notifier -sound default -ignoreDnD"
 alias claudinho="claude --dangerously-skip-permissions --model opus"
 alias copium="copilot --autopilot"
+alias gippity='codex --dangerously-bypass-approvals-and-sandbox'
 alias kayfabe-dev="$HOME/personal/kayfabe/target/debug/kayfabe"
 alias kayfabe-dev-build="cargo build --manifest-path $HOME/personal/kayfabe/Cargo.toml"
 

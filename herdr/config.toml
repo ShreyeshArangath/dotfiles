@@ -1,4 +1,10 @@
 onboarding = false
+
+[terminal]
+default_shell = "/bin/zsh"
+shell_mode = "login"
+new_cwd = "follow"
+
 [theme]
 name = "kanagawa"
 
