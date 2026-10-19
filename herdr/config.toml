@@ -19,8 +19,6 @@ rename_workspace = "prefix+shift+r"
 close_workspace = ["prefix+shift+d", "prefix+ampersand"]
 previous_workspace = "alt+["
 next_workspace = "alt+]"
-previous_agent = "alt+k"
-next_agent = "alt+j"
 
 new_tab = "prefix+c"
 previous_tab = ["prefix+p", "alt+p"]
@@ -29,8 +27,8 @@ switch_tab = ["prefix+1..9", "alt+1..9"]
 goto = ["prefix+g", "alt+w"]
 
 focus_pane_left = ["prefix+h", "alt+h"]
-focus_pane_down = "prefix+j"
-focus_pane_up = "prefix+k"
+focus_pane_down = ["prefix+j", "alt+j"]
+focus_pane_up = ["prefix+k", "alt+k"]
 focus_pane_right = ["prefix+l", "alt+l"]
 last_pane = "alt+tab"
 
