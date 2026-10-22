@@ -157,6 +157,8 @@ fi
 alias vi="nvim"
 alias vim="nvim"
 alias notify="terminal-notifier -sound default -ignoreDnD"
+alias elon='cursor agent --yolo'
+alias elon-gotta-read='cursor'
 alias claudinho="claude --dangerously-skip-permissions --model opus"
 alias copium="copilot --autopilot"
 alias gippity='codex --dangerously-bypass-approvals-and-sandbox'

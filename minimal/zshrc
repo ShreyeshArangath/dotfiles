@@ -56,6 +56,9 @@ unset theme_file
 if (( $+commands[nvim] )); then
   alias vi=nvim vim=nvim
 fi
+alias elon='cursor agent --yolo'
+alias elon-gotta-read='cursor'
+alias claudinho='claude --dangerously-skip-permissions'
 alias gippity='codex --dangerously-bypass-approvals-and-sandbox'
 
 # Ghost-text history suggestions when the light plugin is installed.
