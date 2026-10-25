@@ -102,6 +102,7 @@ class SetupTests(unittest.TestCase):
             originals.update({
                 ".config/karabiner/karabiner.json": '{"original": true}\n',
                 "Library/Application Support/com.mitchellh.ghostty/config": "font-size = 18\n",
+                "Library/Application Support/Cursor/User/settings.json": '{"original": true}\n',
             })
         for path, content in originals.items():
             target = self.home / path
@@ -143,11 +144,12 @@ class SetupTests(unittest.TestCase):
         uname.chmod(0o755)
         native_config = self.home / "Library/Application Support/com.mitchellh.ghostty/config"
         keyboard_config = self.home / ".config/karabiner/karabiner.json"
-        for target in (native_config, keyboard_config):
+        cursor_config = self.home / "Library/Application Support/Cursor/User/settings.json"
+        for target in (native_config, keyboard_config, cursor_config):
             target.parent.mkdir(parents=True, exist_ok=True)
             target.write_text("untouched\n")
         self.assert_success(self.setup_configs())
-        for target in (native_config, keyboard_config):
+        for target in (native_config, keyboard_config, cursor_config):
             self.assertFalse(target.is_symlink())
             self.assertTrue(target.exists(), str(target))
             self.assertEqual(target.read_text(), "untouched\n")

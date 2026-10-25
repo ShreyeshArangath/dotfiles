@@ -36,6 +36,14 @@ DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$DOTFILES_DIR"
 OS="$(uname -s)"
 
+# Holding a letter repeats it. Otherwise macOS opens the accent menu,
+# which is why a held j or k never moves in Vim.
+if [ "$OS" = Darwin ]; then
+    defaults write -g ApplePressAndHoldEnabled -bool false
+    defaults write com.todesktop.230313mzl4w4u92 ApplePressAndHoldEnabled -bool false
+    defaults write com.mitchellh.ghostty ApplePressAndHoldEnabled -bool false
+fi
+
 if [ "$MINIMAL" = true ]; then
     if [ "$DOTFILES_WITH_COPILOT" = 1 ]; then
         echo "--minimal cannot be combined with --with-copilot." >&2
@@ -97,6 +105,7 @@ for relative_path in \
     .zshrc .zprofile .profile .p10k.zsh .gitconfig .tmux.conf .ideavimrc \
     .config/nvim .config/git/ignore .config/ghostty/config \
     "Library/Application Support/com.mitchellh.ghostty/config" \
+    "Library/Application Support/Cursor/User/settings.json" \
     .config/herdr/config.toml .config/herdr/sounds/silent.mp3 \
     .config/karabiner/karabiner.json \
     .claude/CLAUDE.md .claude/claude-logo.png .claude/hooks/notify-on-stop.py \

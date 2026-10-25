@@ -52,6 +52,11 @@ bootstrap runs to keep the full config. Octo requires a separately authenticated
 GitHub CLI account for its GitHub features.
 Leave Neovim open until plugin, formatter, and parser installation finishes.
 
+In the full Neovim config, press `Space`, `s`, `f` in normal mode to search
+filenames across the current file's Git repo or worktree. Bare `sf` is an alias.
+Outside Git, it searches the current directory. The picker respects ignore rules;
+use `Alt-h` to toggle hidden files and `Alt-i` to toggle ignored files.
+
 To include Herdr settings and its silent notification sound as well:
 
 ```bash
@@ -122,6 +127,7 @@ After setup:
 | `herdr/` | Theme, navigation, agent restore preferences, silent notification sound |
 | `ghostty/` | Shift+Enter and macOS window preferences |
 | `karabiner/` | macOS keyboard remapping |
+| `cursor/` | Cursor settings for the embedded Neovim config |
 | `claude/` | Shared agent instructions, personal skills, notification hook |
 | `copilot/` | Optional personal defaults and humanizer skill (`--with-copilot`) |
 | `url-forwarder/` | Browser forwarding from an SSH-connected VM |
@@ -129,7 +135,9 @@ After setup:
 Herdr logs, sockets, session snapshots, plugin registries, and saved workspaces
 stay local. Herdr's memory/disk status commands and Ghostty's window preferences
 are macOS-specific; adjust them if restoring those apps on another OS.
-Karabiner and Ghostty's native macOS config path are linked only on macOS.
+Karabiner, Cursor settings, and Ghostty's native macOS config path are linked only on macOS.
+Setup also turns off the macOS accent menu, so a held key repeats. Quit and reopen Cursor after that change.
+Cursor needs the vscode-neovim extension. Space is leader, and space-gd goes to definition.
 
 `claude/AGENTS.md` supplies Claude's global instructions and, when opted in,
 Copilot's instructions. Run `p10k configure` to regenerate the prompt config with

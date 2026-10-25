@@ -26,6 +26,9 @@
     ~/.config/karabiner/karabiner.json:
       path: karabiner/karabiner.json
       if: '[ "$(uname -s)" = Darwin ]'
+    ~/Library/Application Support/Cursor/User/settings.json:
+      path: cursor/settings.json
+      if: '[ "$(uname -s)" = Darwin ]'
 
     # Shared instructions; Copilot is opt-in.
     ~/.claude/CLAUDE.md: claude/AGENTS.md

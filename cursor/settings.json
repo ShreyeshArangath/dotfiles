@@ -1,0 +1,9 @@
+{
+    "window.autoDetectColorScheme": true,
+    "extensions.installCooldownHours": 24,
+    "workbench.preferredLightColorTheme": "Cursor Dark Midnight",
+    "vscode-neovim.neovimExecutablePaths.darwin": "/opt/homebrew/bin/nvim",
+    "extensions.experimental.affinity": {
+        "asvetliakov.vscode-neovim": 1
+    }
+}
