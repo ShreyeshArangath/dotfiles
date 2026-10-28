@@ -33,6 +33,8 @@
     # Shared instructions; Copilot is opt-in.
     ~/.agents/AGENTS.md: agents/AGENTS.md
     ~/.codex/AGENTS.md: agents/AGENTS.md
+    ~/.agents/skills/five-knuckle-shuffle: agents/skills/five-knuckle-shuffle
+    ~/.codex/skills/five-knuckle-shuffle: agents/skills/five-knuckle-shuffle
     ~/.claude/CLAUDE.md: claude/AGENTS.md
     ~/.copilot/copilot-instructions.md:
       path: claude/AGENTS.md

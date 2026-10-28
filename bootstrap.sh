@@ -110,6 +110,7 @@ for relative_path in \
     .config/karabiner/karabiner.json \
     .claude/CLAUDE.md .claude/claude-logo.png .claude/hooks/notify-on-stop.py \
     .claude/skills/code-review .claude/skills/worktree-manager \
+    .agents/skills/five-knuckle-shuffle .codex/skills/five-knuckle-shuffle \
     .copilot/copilot-instructions.md .copilot/skills/humanizer \
     .local/bin/url-listener .local/bin/url-forwarder-register \
     .local/bin/open-on-host .local/bin/xdg-open; do

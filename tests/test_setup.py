@@ -50,6 +50,8 @@ class SetupTests(unittest.TestCase):
             ".config/ghostty/config": "ghostty/config",
             ".config/git/ignore": "git/ignore",
             ".claude/CLAUDE.md": "claude/AGENTS.md",
+            ".agents/skills/five-knuckle-shuffle": "agents/skills/five-knuckle-shuffle",
+            ".codex/skills/five-knuckle-shuffle": "agents/skills/five-knuckle-shuffle",
         }
         for destination, source in expected.items():
             with self.subTest(destination=destination):
