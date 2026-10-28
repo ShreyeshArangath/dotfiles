@@ -41,7 +41,8 @@ resize_pane_up = "alt+shift+k"
 resize_pane_right = "alt+shift+l"
 
 [ui.toast]
-delivery = "system"
+# Ask Ghostty for the desktop notification so a click focuses this window.
+delivery = "terminal"
 
 [ui.sound]
 enabled = true
