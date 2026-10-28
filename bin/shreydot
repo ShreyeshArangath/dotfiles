@@ -1,0 +1,240 @@
+#!/usr/bin/env python3
+"""Install dotfile profiles from this repo, or from the Homebrew opt keg."""
+
+import importlib.util
+import os
+import shutil
+import subprocess
+import sys
+from pathlib import Path
+
+
+PROFILES = ("noob", "nvim", "agents", "vi", "tmux", "herdr", "full")
+
+TOP_HELP = """\
+usage: shreydot install <profile> [profile...]
+       shreydot install -h
+
+Install pieces of these dotfiles. ./bin/shreydot links this checkout.
+The Homebrew formula links the opt keg, so brew upgrade does not dangle them.
+"""
+
+INSTALL_HELP = """\
+usage: shreydot install <profile> [profile...]
+
+profiles:
+  noob     setup: lean shell, git, tmux, nvim, ghostty, two light zsh plugins
+  nvim     full Neovim config. plugins download the first time you open nvim
+  agents   shared AGENTS.md, Claude skills, and the stop hook
+  vi       IdeaVim (~/.ideavimrc). the shell's vi mode is already in noob
+  tmux     full tmux config. clones TPM unless you pass --links-only
+  herdr    Herdr settings and the silent sound. install the binary yourself
+  full     existing ./bootstrap.sh: packages, plugins, and every config
+
+examples:
+  shreydot install noob
+  shreydot install noob nvim herdr
+  shreydot install tmux herdr
+  shreydot install agents --with-copilot
+
+flags:
+  --links-only         symlinks only. no Homebrew, clones, or macOS key-repeat tweak
+  --with-copilot       also link Copilot instructions. not allowed with noob
+  --skip-zsh-plugins   noob only. skip autosuggestions and syntax-highlighting
+"""
+
+# Later names win. nvim replaces the lean editor that noob links.
+MERGE_ORDER = ("noob", "vi", "tmux", "herdr", "agents", "nvim")
+
+
+def repo_root():
+    override = os.environ.get("SHREYDOT_ROOT")
+    if override:
+        root = Path(override)
+    else:
+        root = Path(__file__).resolve().parent.parent
+    if not (root / "install-minimal.py").is_file():
+        raise SystemExit("shreydot: no dotfiles at {}".format(root))
+    return root
+
+
+def load_minimal(root):
+    path = root / "install-minimal.py"
+    spec = importlib.util.spec_from_file_location("install_minimal", path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def parse_install(argv):
+    flags = {"links_only": False, "with_copilot": False, "skip_zsh_plugins": False}
+    profiles = []
+    for arg in argv:
+        if arg in ("-h", "--help"):
+            return "help", [], flags
+        if arg == "--links-only":
+            flags["links_only"] = True
+        elif arg == "--with-copilot":
+            flags["with_copilot"] = True
+        elif arg == "--skip-zsh-plugins":
+            flags["skip_zsh_plugins"] = True
+        elif arg.startswith("-"):
+            raise SystemExit("Unknown option: {}\n\n{}".format(arg, INSTALL_HELP))
+        else:
+            profiles.append(arg)
+    return "install", profiles, flags
+
+
+def profile_links(name, minimal, with_copilot):
+    if name == "noob":
+        return dict(minimal.LINKS)
+    if name == "nvim":
+        return {".config/nvim": "nvim"}
+    if name == "vi":
+        return {".ideavimrc": "ideavim/.ideavimrc"}
+    if name == "tmux":
+        return {".tmux.conf": "tmux/.tmux.conf"}
+    if name == "herdr":
+        return {
+            ".config/herdr/config.toml": "herdr/config.toml",
+            ".config/herdr/sounds/silent.mp3": "herdr/sounds/silent.mp3",
+        }
+    if name == "agents":
+        links = {
+            ".agents/AGENTS.md": "agents/AGENTS.md",
+            ".codex/AGENTS.md": "agents/AGENTS.md",
+            ".agents/skills/five-knuckle-shuffle": "agents/skills/five-knuckle-shuffle",
+            ".codex/skills/five-knuckle-shuffle": "agents/skills/five-knuckle-shuffle",
+            ".claude/CLAUDE.md": "claude/AGENTS.md",
+            ".claude/skills/code-review": "claude/skills/code-review",
+            ".claude/skills/worktree-manager": "claude/skills/worktree-manager",
+            ".claude/hooks/notify-on-stop.py": "claude/hooks/notify-on-stop.py",
+            ".claude/claude-logo.png": "claude/claude-logo.png",
+        }
+        if with_copilot:
+            links[".copilot/copilot-instructions.md"] = "claude/AGENTS.md"
+            links[".copilot/skills/humanizer"] = "copilot/skills/humanizer"
+        return links
+    raise SystemExit("Unknown profile: {}".format(name))
+
+
+def disable_press_and_hold():
+    """Held keys should repeat in Vim. macOS otherwise opens the accent menu."""
+    if sys.platform != "darwin":
+        return
+    for target in ("-g", "com.todesktop.230313mzl4w4u92", "com.mitchellh.ghostty"):
+        subprocess.run(
+            ["defaults", "write", target, "ApplePressAndHoldEnabled", "-bool", "false"],
+            check=True,
+        )
+
+
+def ensure_tpm(home):
+    dest = home / ".tmux/plugins/tpm"
+    if (dest / "tpm").is_file() or (dest / ".git").is_dir():
+        print("TPM already installed", flush=True)
+        return
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    print("Installing Tmux Plugin Manager...", flush=True)
+    try:
+        subprocess.run(
+            ["git", "clone", "--depth=1", "https://github.com/tmux-plugins/tpm", str(dest)],
+            check=True,
+        )
+    except (OSError, subprocess.CalledProcessError) as exc:
+        print(
+            "Warning: could not install TPM: {} (config is linked; clone it later into {})".format(
+                exc, dest
+            ),
+            flush=True,
+        )
+        if dest.exists() and not any(dest.iterdir()):
+            dest.rmdir()
+        return
+    print("TPM installed. In tmux, prefix + I installs plugins.", flush=True)
+
+
+def install(argv):
+    action, profiles, flags = parse_install(argv)
+    if action == "help" or not profiles:
+        print(INSTALL_HELP, end="")
+        return 0 if action == "help" else 2
+
+    unknown = [name for name in profiles if name not in PROFILES]
+    if unknown:
+        raise SystemExit(
+            "Unknown profile: {}\n\n{}".format(", ".join(unknown), INSTALL_HELP)
+        )
+    if "full" in profiles and len(set(profiles)) != 1:
+        raise SystemExit("full is the whole bootstrap. Don't mix it with other profiles.")
+    if "noob" in profiles and flags["with_copilot"]:
+        raise SystemExit(
+            "noob cannot be combined with --with-copilot.\n"
+            "Copilot is separate: shreydot install agents --with-copilot"
+        )
+
+    root = repo_root()
+    if "full" in profiles:
+        cmd = [str(root / "bootstrap.sh")]
+        if flags["links_only"]:
+            cmd.append("--links-only")
+        if flags["with_copilot"]:
+            cmd.append("--with-copilot")
+        os.execv(cmd[0], cmd)
+
+    minimal = load_minimal(root)
+    selected = [name for name in MERGE_ORDER if name in profiles]
+    links = {}
+    for name in selected:
+        links.update(profile_links(name, minimal, flags["with_copilot"]))
+
+    home = Path.home()
+    if "noob" in selected and not flags["links_only"]:
+        disable_press_and_hold()
+    minimal.install_links(home, links, root, backup_prefix="shreydot.")
+
+    if flags["with_copilot"]:
+        settings = home / ".copilot/settings.json"
+        source = root / "copilot/settings.json"
+        if not settings.exists():
+            settings.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(str(source), str(settings))
+            print("Copied {}".format(settings), flush=True)
+
+    if "noob" in selected and not flags["links_only"]:
+        if flags["skip_zsh_plugins"]:
+            print("Skipped light zsh plugins (--skip-zsh-plugins).", flush=True)
+        else:
+            minimal.ensure_light_zsh_plugins(home)
+    if "tmux" in selected and not flags["links_only"]:
+        ensure_tpm(home)
+
+    print("Installed: {}".format(" ".join(selected)), flush=True)
+    if "nvim" in selected:
+        print("Full Neovim config linked. Neovim installs its plugins on launch.", flush=True)
+    if "herdr" in selected:
+        print("Herdr config linked. Reload its config or restart Herdr.", flush=True)
+    if "noob" in selected:
+        print("Restart your shell.", flush=True)
+    return 0
+
+
+def main(argv):
+    if not argv or argv[0] in ("-h", "--help", "help"):
+        print(TOP_HELP, end="")
+        return 0
+    if argv[0] != "install":
+        print("Unknown command: {}\n".format(argv[0]), file=sys.stderr)
+        print(TOP_HELP, end="", file=sys.stderr)
+        return 2
+    return install(argv[1:])
+
+
+if __name__ == "__main__":
+    try:
+        sys.exit(main(sys.argv[1:]))
+    except SystemExit as exc:
+        if isinstance(exc.code, str):
+            print(exc.code, file=sys.stderr)
+            sys.exit(2)
+        raise

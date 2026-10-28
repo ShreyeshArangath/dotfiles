@@ -55,6 +55,33 @@ def ensure_light_zsh_plugins(home: Path) -> None:
                 dest.rmdir()
 
 
+def install_links(home, links, root=None, backup_prefix="minimal."):
+    """Back up anything in the way, then symlink. Pass root un-resolved so a
+    Homebrew opt path survives cellar upgrades."""
+    if root is None:
+        root = ROOT
+    for source in links.values():
+        if not (root / source).exists():
+            raise FileNotFoundError(root / source)
+    backup = None
+    for destination, source in links.items():
+        target, original = home / destination, root / source
+        if target.is_symlink() and target.resolve() == original.resolve():
+            continue
+        if os.path.lexists(target):
+            if backup is None:
+                backup_root = home / ".dotfiles_backup"
+                backup_root.mkdir(parents=True, exist_ok=True)
+                backup = Path(tempfile.mkdtemp(prefix=backup_prefix, dir=backup_root))
+                print("Existing configs backed up to: {}".format(backup), flush=True)
+            saved = backup / destination
+            saved.parent.mkdir(parents=True, exist_ok=True)
+            target.rename(saved)
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.symlink_to(original, target_is_directory=original.is_dir())
+        print("Linked {}".format(target))
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--with-nvim", action="store_true", help="Link the full Neovim config")
@@ -72,27 +99,7 @@ def main():
         links[".config/herdr/config.toml"] = "herdr/config.toml"
         links[".config/herdr/sounds/silent.mp3"] = "herdr/sounds/silent.mp3"
     home = Path.home()
-    # Check every source before moving any existing configuration.
-    for source in links.values():
-        if not (ROOT / source).exists():
-            raise FileNotFoundError(ROOT / source)
-    backup = None
-    for destination, source in links.items():
-        target, original = home / destination, ROOT / source
-        if target.is_symlink() and target.resolve() == original.resolve():
-            continue
-        if os.path.lexists(target):
-            if backup is None:
-                backup_root = home / ".dotfiles_backup"
-                backup_root.mkdir(parents=True, exist_ok=True)
-                backup = Path(tempfile.mkdtemp(prefix="minimal.", dir=backup_root))
-                print("Existing configs backed up to: {}".format(backup), flush=True)
-            saved = backup / destination
-            saved.parent.mkdir(parents=True, exist_ok=True)
-            target.rename(saved)
-        target.parent.mkdir(parents=True, exist_ok=True)
-        target.symlink_to(original, target_is_directory=original.is_dir())
-        print("Linked {}".format(target))
+    install_links(home, links)
     if args.skip_zsh_plugins:
         print("Skipped light zsh plugins (--skip-zsh-plugins).", flush=True)
     else:

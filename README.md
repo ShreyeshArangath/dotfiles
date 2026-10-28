@@ -3,6 +3,38 @@
 Personal macOS and Linux configs managed with [Dotbot](https://github.com/anishathalye/dotbot).
 No employer credentials, SSH host registrations, or agent session data belong here.
 
+## shreydot
+
+`shreydot install` links one profile at a time. From a checkout, `./bin/shreydot`
+uses this tree. `./bootstrap.sh` is still the full installer; `shreydot install full`
+calls it.
+
+```bash
+./bin/shreydot install -h
+./bin/shreydot install noob
+./bin/shreydot install noob nvim herdr
+./bin/shreydot install tmux herdr
+./bin/shreydot install agents --with-copilot
+```
+
+`noob` is the lean setup (`minimal/` plus two light zsh plugins). `nvim` swaps in
+the full Neovim config. `vi` is IdeaVim. `agents` skips Copilot unless you pass
+`--with-copilot`. `--links-only` skips Homebrew, git clones, and the macOS
+key-repeat tweak.
+
+The GitHub repo is not named `homebrew-dotfiles`, so the tap needs a URL, and
+there is no release tarball yet:
+
+```bash
+brew tap ShreyeshArangath/dotfiles https://github.com/ShreyeshArangath/dotfiles
+brew install --HEAD shreydot
+shreydot install -h
+```
+
+Symlinks point at the Homebrew opt keg. `brew upgrade --fetch shreydot` moves
+that keg, and links that already exist keep working. Run install again when a
+profile grows a new file.
+
 ## Set up a new device
 
 For a lean setup using only local files and Python 3:
