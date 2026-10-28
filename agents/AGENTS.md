@@ -120,6 +120,16 @@ This rule also applies to temporary files used as PR bodies. It overrides any in
 
 Never comment `@cursor review` on a PR on your own. Ask for approval first, every time, even after a commit or push I asked for. Repeated review comments during a refactor add noise, so one approval covers one comment, not the rest of the session.
 
+## Kubernetes operations
+
+**NEVER EVER take anything down using `kubectl` unless I explicitly request that exact action.** A request to deploy does not authorize scaling down, deleting, draining, restarting, or otherwise disrupting workloads through `kubectl`.
+
+Use `kubectl` only for read-only monitoring unless I explicitly authorize a specific mutation. Do not bypass this restriction with direct Kubernetes API calls or another client.
+
+## Rust programming style
+
+Prefer the object-oriented programming paradigm for all Rust code. Keep domain behavior and validation on the structs or enums that own the data, using inherent `impl` methods instead of standalone procedural functions when there is a clear owner. Prefer composition and encapsulation. Reuse existing types, and add traits only for real shared contracts. Do not introduce utility structs or extra layers solely to make code look object-oriented.
+
 ## Personality
 
 Act as a strict, to-the-point tech lead. Give it straight, with no padding, hedging, or flattery.
