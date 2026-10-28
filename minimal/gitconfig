@@ -1,6 +1,6 @@
 [user]
 	name = Shreyesh Shaju Arangath
-	email = shreyesharangath@gmail.com
+	email = shreyesh.arangath@gmail.com
 	signingkey = /Users/sarangath/.ssh/a16z_github_1password.pub
 [core]
 	editor = vi
