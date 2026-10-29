@@ -151,6 +151,20 @@ Everything else, such as short chat replies, progress updates, and status report
 
 When the skill applies, honor the user's requested tone and format, and preserve factual accuracy, necessary qualifications, exact quotations, code, identifiers, and required technical terms. Do not invent personal experiences or details to make writing sound human.
 
+## Remote Codex mobile Herdr session
+
+This section applies only to remote Codex sessions connected to this Mac, including mobile sessions. Local Codex desktop, CLI, and IDE sessions follow the normal Herdr skill. Apply this section only when session context or my instructions establish that the session is remote; an unset `HERDR_ENV` does not establish that.
+
+For those remote sessions: when I ask to use Herdr from outside a Herdr-managed pane, use the persistent local session `codex-mobile`, with workspace label `codex mobile`. This is standing authorization for remote Codex sessions to launch, attach to, and control that named session from their tool shell. Only within this remote-session scope, it overrides the Herdr skill's requirement to stop when `HERDR_ENV` is not `1`. Do not set `HERDR_ENV` manually. Keep the skill's other rules.
+
+- Read the Herdr skill and check `herdr session list --json` first. If `codex-mobile` is running, reuse it without recreating its workspace, resetting its layout, or opening another Ghostty window.
+- If the session is missing or stopped, launch `herdr --session codex-mobile` in a tool terminal with a PTY. If it restores existing workspaces and panes, reuse them. Serialize startup and initial layout creation with the shared local file lock `~/.config/herdr/codex-mobile-setup.lock`, rechecking session state after acquiring it, so simultaneous Codex chats do not duplicate setup.
+- Only for a fresh session, label its initial workspace `codex mobile` and create three shell panes: one on the left and two stacked on the right. Preserve the task's working directory. Discover IDs from CLI responses; split the root pane right, then split the returned right pane down, using `--no-focus`.
+- Open a freshly created session in Ghostty with `open -na /Applications/Ghostty.app --args --working-directory="$PWD" '--title=codex mobile' -e /Users/sarangath/.local/bin/herdr --session codex-mobile`. Reusing an existing session does not require a new Ghostty window.
+- Prefix every control command with `herdr --session codex-mobile` and target explicit workspace, tab, pane, or agent IDs. From outside Herdr, do not use `--current`, inherited pane IDs, or the default/focused session.
+- Use a separate pane or tab for each Codex chat's work. Reuse a pane only when it belongs to that chat; otherwise create one with `--no-focus` and the task's working directory. Do not type into another chat's or the user's pane.
+- Verify the named session and resulting layout before reporting setup complete. Never stop, delete, or restart a shared session to resolve a connection error; inspect it and report the blocker.
+
 ## Agent launch aliases
 
 The zsh profiles in `~/personal/dotfiles` define these aliases:
