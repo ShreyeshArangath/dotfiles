@@ -80,5 +80,5 @@ description = "toggle review pane"
 [[keys.command]]
 key = "prefix+h"
 type = "plugin_action"
-command = "shrey.git.hide"
-description = "hide Git pane"
+command = "shrey.git.toggle"
+description = "toggle Git pane"

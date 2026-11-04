@@ -105,8 +105,9 @@ On macOS, authenticate GitHub access and install Rust through rustup, then run
 herdr-bar, my herdr-reviewr fork, and my private herdr-git plugin. Existing local
 development links stay linked. Run `herdr server reload-config` after installation.
 
-Press `Ctrl+B`, release, then `H` to hide the Git strip in the current tab.
-It stays hidden when you split another terminal. `Alt+H` focuses left.
+Press `Ctrl+B`, release, then `H` to hide or show Git in the current tab.
+In tabs with several terminals, Git opens above the focused terminal. It stays
+hidden when you split another terminal. `Alt+H` focuses left.
 `Ctrl+B`, then `D` toggles reviewr; `Ctrl+B`, then `F` opens the command bar.
 
 Install Git and Python 3.7+ first. On macOS, also install
