@@ -26,7 +26,7 @@ next_tab = ["prefix+n", "alt+n"]
 switch_tab = ["prefix+1..9", "alt+1..9"]
 goto = ["prefix+g", "alt+w"]
 
-focus_pane_left = ["prefix+h", "alt+h"]
+focus_pane_left = "alt+h"
 focus_pane_down = ["prefix+j", "alt+j"]
 focus_pane_up = ["prefix+k", "alt+k"]
 focus_pane_right = ["prefix+l", "alt+l"]
@@ -64,3 +64,21 @@ tab_bar_right = [
   { type = "command", command = "df -k /System/Volumes/Data | awk 'NR==2 {print \"DISK \" $5}'", interval_seconds = 10, timeout_seconds = 2 },
 ]
 tab_bar_right_separator = " · "
+
+[[keys.command]]
+key = "prefix+f"
+type = "plugin_action"
+command = "herdr-bar.open"
+description = "command bar"
+
+[[keys.command]]
+key = "prefix+d"
+type = "plugin_action"
+command = "persiyanov.reviewr.toggle"
+description = "toggle review pane"
+
+[[keys.command]]
+key = "prefix+h"
+type = "plugin_action"
+command = "shrey.git.hide"
+description = "hide Git pane"

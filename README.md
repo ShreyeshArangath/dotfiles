@@ -100,6 +100,15 @@ This only installs `config.toml` and `sounds/silent.mp3`; the Herdr binary must
 already be installed. For a running server, apply the settings with
 `herdr server reload-config`.
 
+On macOS, authenticate GitHub access and install Rust through rustup, then run
+`python3 herdr/install-plugins.py`. This installs pinned versions of
+herdr-bar, my herdr-reviewr fork, and my private herdr-git plugin. Existing local
+development links stay linked. Run `herdr server reload-config` after installation.
+
+Press `Ctrl+B`, release, then `H` to hide the Git strip in the current tab.
+It stays hidden when you split another terminal. `Alt+H` focuses left.
+`Ctrl+B`, then `D` toggles reviewr; `Ctrl+B`, then `F` opens the command bar.
+
 Install Git and Python 3.7+ first. On macOS, also install
 [Homebrew](https://brew.sh) using a method approved for that device.
 
@@ -144,7 +153,7 @@ After setup:
   line; press Enter to run it. Run `exec zsh` to activate changes in an old shell.
 - Open Neovim to install its configured plugins.
 - Install Herdr through an approved source, then reload its config or restart it.
-  Its binary and plugins are not installed by this repo.
+  Its binary is installed separately. Plugin installation is an explicit step above.
 - On macOS, grant Karabiner-Elements the permissions it requests.
 
 ## What's tracked
@@ -156,7 +165,7 @@ After setup:
 | `tmux/` | Vim navigation, Dracula theme, resurrect/continuum session settings |
 | `nvim/` | LazyVim setup, plugins, keymaps, SSH clipboard settings |
 | `ideavim/` | IdeaVim options and IDE keymaps |
-| `herdr/` | Theme, navigation, agent restore preferences, silent notification sound |
+| `herdr/` | Theme, navigation, agent restore preferences, silent notification sound, plugin installer |
 | `ghostty/` | Shift+Enter and macOS window preferences |
 | `karabiner/` | macOS keyboard remapping |
 | `cursor/` | Cursor settings for the embedded Neovim config |
