@@ -108,6 +108,9 @@ development links stay linked. Run `herdr server reload-config` after installati
 Press `Ctrl+B`, release, then `H` to hide or show Git in the current tab.
 In tabs with several terminals, Git opens above the focused terminal. It stays
 hidden when you split another terminal. `Alt+H` focuses left.
+Choose **Review diff** in the Git header to pin the diff below it in the same top
+section. `Ctrl+B`, then `H` hides and restores the entire section, including notes
+and unfinished review comments. This works above any terminal or agent.
 `Ctrl+B`, then `D` toggles reviewr; `Ctrl+B`, then `F` opens the command bar.
 
 Install Git and Python 3.7+ first. On macOS, also install

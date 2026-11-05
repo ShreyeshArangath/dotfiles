@@ -7,8 +7,8 @@ import subprocess
 
 PLUGINS = (
     ("herdr-bar", "jeffarese/herdr-bar", "d9cdd88cb734615e96b1c37ed17fc39be904f060"),
-    ("persiyanov.reviewr", "ShreyeshArangath/herdr-reviewr", "ebe5a5cca76e94d5b23249f4fcada032190dc73a"),
-    ("shrey.git", "ShreyeshArangath/herdr-git", "18b5fca1c3def00f4d68fbe9acf1c41b4986a5c6"),
+    ("persiyanov.reviewr", "ShreyeshArangath/herdr-reviewr", "b0fbb6b8c26dc7080ea01a41048d138fee7f8bf9"),
+    ("shrey.git", "ShreyeshArangath/herdr-git", "258f0682d31a41882957f4a1bd6f33181add2bd6"),
 )
 
 

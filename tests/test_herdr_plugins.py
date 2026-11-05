@@ -68,7 +68,7 @@ class HerdrPluginTests(unittest.TestCase):
         })
         self.assertEqual(state["calls"], [
             ["plugin", "install", "ShreyeshArangath/herdr-reviewr", "--ref",
-             "ebe5a5cca76e94d5b23249f4fcada032190dc73a", "--yes"],
+             "b0fbb6b8c26dc7080ea01a41048d138fee7f8bf9", "--yes"],
             ["plugin", "enable", "shrey.git"],
         ])
         self.assertEqual(state["plugins"]["shrey.git"]["source"], {"kind": "local"})
