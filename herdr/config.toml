@@ -74,8 +74,8 @@ description = "command bar"
 [[keys.command]]
 key = "prefix+d"
 type = "plugin_action"
-command = "persiyanov.reviewr.toggle"
-description = "toggle review pane"
+command = "shrey.git.diff"
+description = "open pinned diff and focus Git"
 
 [[keys.command]]
 key = "prefix+h"

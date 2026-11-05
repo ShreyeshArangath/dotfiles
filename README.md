@@ -113,7 +113,7 @@ section. `Ctrl+B`, then `H` hides and restores the entire section, including not
 and unfinished review comments. This works above any terminal or agent.
 Closing just the diff returns the Git header to its previous compact size.
 Focus the Git pane to show its spinning gold pixel-art championship belt when space permits. It disappears when you leave the pane.
-`Ctrl+B`, then `D` toggles reviewr; `Ctrl+B`, then `F` opens the command bar.
+`Ctrl+B`, then `D` opens the pinned diff in the Git section and focuses its header from any pane in the tab. It restores a hidden section and reuses an open review. `Ctrl+B`, then `F` opens the command bar.
 
 Install Git and Python 3.7+ first. On macOS, also install
 [Homebrew](https://brew.sh) using a method approved for that device.
