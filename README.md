@@ -112,6 +112,8 @@ Choose **Review diff** in the Git header to pin the diff below it in the same to
 section. `Ctrl+B`, then `H` hides and restores the entire section, including notes
 and unfinished review comments. This works above any terminal or agent.
 Closing just the diff returns the Git header to its previous compact size.
+In the diff's file tree, `Enter` focuses the selected file or toggles a directory.
+`Esc` returns to the tree after closing a comment box or clearing a selection.
 Focus the Git pane to show its spinning gold pixel-art championship belt when space permits. It disappears when you leave the pane.
 `Ctrl+B`, then `D` opens the pinned diff in the Git section and focuses its header from any pane in the tab. It restores a hidden section and reuses an open review. `Ctrl+B`, then `F` opens the command bar.
 
