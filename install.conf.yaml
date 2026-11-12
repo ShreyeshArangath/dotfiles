@@ -35,6 +35,11 @@
     ~/.codex/AGENTS.md: agents/AGENTS.md
     ~/.agents/skills/five-knuckle-shuffle: agents/skills/five-knuckle-shuffle
     ~/.codex/skills/five-knuckle-shuffle: agents/skills/five-knuckle-shuffle
+    ~/.agents/skills/pr-stack-audit: agents/skills/pr-stack-audit
+    ~/.codex/skills/pr-stack-audit: agents/skills/pr-stack-audit
+    ~/.claude/skills/pr-stack-audit: agents/skills/pr-stack-audit
+    ~/.agents/skills/worktree-manager: claude/skills/worktree-manager
+    ~/.codex/skills/worktree-manager: claude/skills/worktree-manager
     ~/.claude/CLAUDE.md: claude/AGENTS.md
     ~/.copilot/copilot-instructions.md:
       path: claude/AGENTS.md

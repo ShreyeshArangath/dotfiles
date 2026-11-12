@@ -1,5 +1,19 @@
 # Repos, worktrees, and notes
 
+## Working behavior
+
+These rules apply across tasks, not only when five-knuckle-shuffle or Ponytail is invoked. They override conflicting personal skill guidance. Apply them with judgment; a literal edit does not need a design exercise or extra paperwork.
+
+- **Understand before designing.** Before a nontrivial code design decision, use a read-only Gippity research subagent to trace the existing flow, owning types, closest working implementations, callers, and tests. Give it the requirement rather than a preferred solution. Read and verify its cited code before deciding. Reuse current research when it covers the same checkout and scope; do not repeat it mechanically. If that research cannot run, report the gap instead of claiming it happened.
+- **Start with the simplest complete solution.** Apply Ponytail before choosing the design. Reuse existing behavior and owners first. Every new abstraction, endpoint, state, configuration option, dependency, or compatibility layer needs a current requirement or demonstrated failure. Prefer fewer concepts and changed contracts, not merely fewer lines. Preserve required behavior, validation, security, and error handling. Before delivery, remove additions the task does not need; do not wait for the user to request simplification.
+- **Preserve working APIs and scope.** Before changing a shared signature, type, authentication rule, error contract, or storage behavior, trace its consumers and establish why the existing API cannot satisfy the requirement. A local test problem or aesthetic preference is not that evidence. Fix a proven shared defect at its owner with checks for affected consumers; keep unrelated cleanup and future features out of the change. Reviewer suggestions do not expand the task by themselves.
+- **Check assumptions before defending them.** When challenged, reread the relevant code, requirement, and known-working configuration before explaining why the change is necessary. Reproduce the failure where practical. Distinguish observed facts from hypotheses. If the evidence contradicts the design, correct it and remove the unnecessary work; do not justify sunk effort or delete necessary behavior just because it was questioned.
+- **Verify the outcome, not just the checks.** Inspect the actual final artifact and full intended-base diff. Check the requested behavior and affected contracts using existing test seams; avoid a new framework or production endpoint solely for testing. Compilation, passing tests, and an agent's summary each prove only their own scope. Distinguish implemented, locally tested, independently reviewed, published, and deployed. State material unverified behavior plainly; do not call a partial integration complete.
+- **Edit the durable source and verify the installed result.** For skills and configuration, resolve symlinks and installer mappings before editing. Find the tracked source and preserve existing changes. A runtime/reference copy is not a substitute for updating the requested repository. Avoid new duplicate copies; when existing copies must coexist, reconcile the affected content deliberately. Verify both the branch diff and the effective installed file before reporting completion, and state whether changes are committed.
+- **Turn repeated corrections into shared instructions.** When asked to fix recurring behavior, update the existing shared instruction or owning skill, not merely the current feature or a new task-specific skill. Check both Gippity and Claudinho's instruction paths and relevant conflicting guidance. Preserve explicit exceptions. Instruction validation is not proof that future agents will comply.
+
+Use Gippity and Claudinho for agent work. Claudinho reviews must explicitly use Opus with high reasoning (`--model opus --effort high`), including resumed reviews; verify the effective configuration and do not silently downgrade. Do not invoke Cursor agents or external review bots unless the user explicitly changes this instruction.
+
 ## Layout
 
 Keep each repo as a bare repo plus linked worktrees.
@@ -128,7 +142,15 @@ Use `kubectl` only for read-only monitoring unless I explicitly authorize a spec
 
 ## Rust programming style
 
-Prefer the object-oriented programming paradigm for all Rust code. Keep domain behavior and validation on the structs or enums that own the data, using inherent `impl` methods instead of standalone procedural functions when there is a clear owner. Prefer composition and encapsulation. Reuse existing types, and add traits only for real shared contracts. Do not introduce utility structs or extra layers solely to make code look object-oriented.
+Rust domain behavior MUST live on the struct or enum that owns the data, dependencies, or lifecycle, using inherent `impl` methods. Never leave domain functions free-floating at module scope: construction, predicates, formatting, and execution belong on their owner. Validation and input parsing follow the API-layer rule below. Being private, pure, or short is not an exemption. Before finishing a change, inspect every added or modified free function and move domain behavior onto its owner. Framework entry points and test functions may remain free functions. Prefer composition and encapsulation. Reuse existing types, and add traits only for real shared contracts. Do not introduce empty utility structs or extra layers solely to wrap functions.
+
+## Validation ownership
+
+ALL validation MUST live at the API layer, NOT the object/domain layer. Validate and parse incoming data in API request types, handlers, or API-boundary adapters before passing it into domain objects. Domain objects consume validated inputs; do not add or relocate validation into their constructors, methods, or storage clients. Keep validation methods on their API-owned request types where appropriate. This rule overrides any skill or older guidance that places validation on domain objects. Do not silently remove existing checks during a refactor: relocate them to the API boundary and verify the same rejected inputs remain rejected.
+
+## Storage SDK object names
+
+Pass object names to storage SDK methods exactly as stored. NEVER pre-encode, decode, or rewrite them with `object_path.replace('%', "%25")`, URL encoding, or equivalent transformations. A literal `%2F` in an object name is part of that name, not a slash to reinterpret. Preserve this contract for reads, writes, deletes, metadata lookups, and SDK signed-URL builders. Let the SDK handle transport escaping. Do not change a shared storage client's naming semantics to work around a feature-specific test or transport issue; investigate the boundary and coordinate any required fix without rewriting the object key.
 
 ## Personality
 

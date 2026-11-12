@@ -2,7 +2,7 @@
 name: worktree-manager
 description: >
   Set up and manage git worktree-based repository structures. Handles bare clone
-  initialization, worktree creation with prefix-organized directories, listing,
+  initialization, worktree creation using the repository layout, listing,
   removal, and cleanup. Trigger phrases: "set up worktrees", "create worktree",
   "list worktrees", "remove worktree", "cleanup worktrees", "bare clone setup",
   "worktree repo", "new worktree for", "initialize repo with worktrees".
@@ -10,18 +10,9 @@ description: >
 
 # Worktree Manager
 
-Manages git repositories using a bare-clone + worktree pattern. The top-level directory is a bare git repo, and each branch gets its own worktree directory organized by prefix (e.g., `feat/`, `bug/`, `fix/`, `username/`).
+Preserve the repository's existing layout. Resolve it with `git worktree list` and `git rev-parse --git-common-dir --is-bare-repository`; do not convert or relocate an existing clone. A bare repo containing worktrees and a container with a bare `.git/` are both supported.
 
-## Target Structure
-
-```
-<parent-dir>/<repo-name>/          # bare git repo (contains HEAD, config, objects, etc.)
-  main/                            # worktree tracking default branch
-  upstream-main/                   # (forks only) worktree tracking upstream default branch
-  feat/my-feature/                 # worktree for feat/my-feature branch
-  bug/some-fix/                    # worktree for bug/some-fix branch
-  sarangat/experiment/             # worktree for sarangat/experiment branch
-```
+For this user's new work, use `<repo>/<feature>` with branch `shrey/<feature>`; branch prefixes do not become directory prefixes. Keep general work in `main`. Follow applicable repo instructions and current Notion context before changes.
 
 ---
 
@@ -89,23 +80,13 @@ Manages git repositories using a bare-clone + worktree pattern. The top-level di
 
 ### Steps
 
-1. **Must be run from inside a bare repo.** Detect by checking `git rev-parse --is-bare-repository`. If not in a bare repo, look for a bare repo parent or ask the user for the path.
+1. **Resolve the existing repository.** Discover the common Git directory and registered worktrees from the current checkout. Use the existing layout; a linked worktree is a valid starting location.
 
-2. **Check if the branch is already checked out** in another worktree:
-   ```bash
-   git worktree list --porcelain | grep -A1 "branch refs/heads/<branch>"
-   ```
-   If so, inform the user and offer to navigate to the existing worktree.
+2. **Check whether the intended branch is already checked out.** Normalize the new branch name first, then parse complete records from `git worktree list --porcelain`. Match the exact `branch refs/heads/<branch>` field and retain its associated `worktree` path. Reuse a matching worktree when it belongs to this task; do not create a duplicate or take over another actor's checkout.
 
-3. **Parse the prefix** from the branch name. Everything before the last `/` becomes the directory prefix. If no `/`, the worktree goes at the top level.
-   - `feat/my-feature` → prefix `feat/`, dir `feat/my-feature`
-   - `sarangat/experiment` → prefix `sarangat/`, dir `sarangat/experiment`
-   - `hotfix` → dir `hotfix`
+3. **Resolve the name and path.** For a new feature, use branch `shrey/<feature>` and sibling directory `<feature>`. Preserve a supplied existing branch name. Never check a feature branch out in `main`.
 
-4. **Create prefix directory** if needed:
-   ```bash
-   mkdir -p <prefix>
-   ```
+4. **Verify the starting ref** and that the destination is unused. Follow the repo's update-main rules; preserve dirty work and stop unsafe updates instead of stashing, resetting, or rebasing it.
 
 5. **Create the worktree.** If the branch already exists on a remote, track it. Otherwise create a new branch:
    ```bash
@@ -117,13 +98,13 @@ Manages git repositories using a bare-clone + worktree pattern. The top-level di
    ```
    Where `<base-ref>` is what the user specified, or defaults to `origin/<default-branch>` (or `upstream/<default-branch>` for forks).
 
-6. **Confirm** with the path to the new worktree.
+6. **Confirm** the path and branch through `git worktree list`. Record the worktree and branch in the existing canonical feature page and hub when required.
 
 ---
 
 ## Operation 3: List Worktrees
 
-Run from inside the bare repo:
+Run from any registered checkout or the common repository:
 
 ```bash
 git worktree list
@@ -133,7 +114,7 @@ Format the output cleanly, showing:
 - Worktree path
 - Branch name
 - Commit hash (short)
-- Whether it has uncommitted changes (check with `git -C <path> status --porcelain` for each)
+- Whether it has uncommitted changes (check with `git -C <path> status --porcelain` for each worktree; skip the bare-repository record)
 
 ---
 
@@ -143,50 +124,20 @@ Format the output cleanly, showing:
 
 ### Steps
 
-1. **Check for dirty state** in the worktree:
-   ```bash
-   git -C <worktree-path> status --porcelain
-   ```
-   If there are uncommitted changes, warn the user and ask for confirmation before proceeding.
-
-2. **Remove the worktree:**
-   ```bash
-   git worktree remove <worktree-path>
-   ```
-   If the worktree is dirty and the user confirms, use `--force`.
-
-3. **Optionally delete the branch** if it has been merged:
-   ```bash
-   git branch -d <branch-name>
-   ```
-   If not merged, ask the user if they want to force-delete with `-D`.
-
-4. **Clean up empty prefix directories:**
-   ```bash
-   # Remove the prefix dir if it's now empty
-   rmdir <prefix-dir> 2>/dev/null
-   ```
+1. Inspect the exact registered path: tracked edits, staged changes, untracked and ignored files, branch head, and active users/processes. A clean tracked diff does not mean the worktree has no local-only files. Do not remove the current working directory, main, or another actor's active worktree.
+2. For “clean up merged work,” verify the PR is actually merged into the intended target. Account for squash/rebase merges and later branch commits; ancestry alone is insufficient. Check that the full branch contribution is retained. An open/closed-unmerged PR, unexplained extra commit, or unknown merge evidence is a hold.
+3. An explicit cleanup request authorizes the verified clean, merged, inactive set. A request to list candidates authorizes reporting only. Identify valuable local-only files and unresolved ownership before removal; do not use force to bypass them. Preserve branch refs unless deletion was separately requested.
+4. Run ordinary `git worktree remove <registered-path>` on the authorized set and re-list. If Git refuses, investigate the reason; do not automatically escalate to force or recursive deletion. Prune stale administrative entries only after verifying the referenced worktree is gone.
+5. When requested, close only the exact owning Herdr tab after verifying it has no other ongoing work, using the Herdr skill and applicable remote-session rules. Do not infer ownership from a matching title or close unrelated panes. Update the canonical feature status and remove its worktree row while preserving the page and links; verify saved notes.
 
 ---
 
 ## Operation 5: Cleanup Stale Worktrees
 
-### Steps
-
-1. **Prune broken worktrees** (where the directory was manually deleted):
-   ```bash
-   git worktree prune
-   ```
-
-2. **Find merged branches** that still have worktrees:
-   ```bash
-   git branch --merged origin/<default-branch>
-   ```
-   Cross-reference with `git worktree list` to identify removable worktrees.
-
-3. **Present the list** of stale/merged worktrees to the user and ask for confirmation before removing each one.
-
-4. Remove confirmed worktrees using the Operation 4 steps.
+1. Inventory paths from `git worktree list --porcelain`; do not construct paths from branch names. Use the intended PR base, not automatically the default branch.
+2. Classify each as eligible, active, dirty/local-only, unmerged, or unknown using Operation 4's checks. Present path, branch, PR/merge evidence and reason. A stale age or large build directory is not evidence of safe removal.
+3. Report only for an audit/list request. For authorized cleanup, remove the eligible set through Operation 4 and leave the others intact. Do not add or run a cache-cleanup schedule as a side effect.
+4. Report removed paths and retained branch refs, held candidates with reasons, and verified note/tab updates. If reporting disk savings, measure before and after rather than summing directory estimates.
 
 ---
 
@@ -194,8 +145,8 @@ Format the output cleanly, showing:
 
 - **Repo already exists at target path:** Stop and inform the user. Do not overwrite.
 - **Branch already checked out:** Inform the user which worktree has it and offer to navigate there.
-- **Dirty worktree removal:** Always warn and require explicit confirmation.
+- **Dirty or active worktree removal:** Hold and show the specific local-only work or owner; ordinary cleanup authorization does not cover discarding it.
 - **Non-GitHub repos:** Skip `gh` fork detection; ask the user directly.
 - **Default branch detection fails:** Try `main`, then `master`, then ask the user.
-- **Any `/` in branch name creates prefix dirs:** `sarangat/deep/nested/branch` → `mkdir -p sarangat/deep/nested/`.
-- **Bare repo detection:** If the user runs a command from a worktree subdirectory, resolve to the bare repo root via `git rev-parse --git-common-dir`.
+- **Branch and directory names differ:** `shrey/search-filters` uses the sibling worktree `search-filters`, not `shrey/search-filters`.
+- **Git directory versus worktree container:** Resolve `git rev-parse --git-common-dir` relative to the command's working directory. A bare `.git/` directory is not the sibling-worktree container. Determine the container from the existing registered paths and layout; never put a new checkout inside the Git directory. Preserve ordinary clones too.

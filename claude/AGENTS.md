@@ -7,10 +7,10 @@
 
 ## Code quality
 
-- Write tests for new functionality.
+- Verify changed behavior with focused checks at existing test seams. Trivial edits do not need new tests; new nontrivial behavior needs appropriate coverage without a new framework or unrelated test expansion.
 - Follow project-specific style guides.
 - Keep commits atomic and well-described.
-- Ensure all tests pass before merging.
+- Run the checks required for the change before delivery; distinguish their results from untested integration or deployed behavior. Passing tests do not authorize merging.
 - Keep comments short; explain only what isn't obvious from the code.
 
 ## Writing
