@@ -1,0 +1,126 @@
+{
+  "bindings" : [
+    {
+      "action" : {
+        "key" : "backspace",
+        "type" : "sendKey"
+      },
+      "input" : {
+        "key" : "space",
+        "modifiers" : [
+          "shift"
+        ]
+      }
+    },
+    {
+      "action" : {
+        "bundleIdentifier" : "com.openai.codex",
+        "type" : "openApp"
+      },
+      "input" : {
+        "key" : "c",
+        "modifiers" : [
+          "fn"
+        ]
+      }
+    },
+    {
+      "action" : {
+        "bundleIdentifier" : "com.mitchellh.ghostty",
+        "type" : "openApp"
+      },
+      "input" : {
+        "key" : "g",
+        "modifiers" : [
+          "fn"
+        ]
+      }
+    },
+    {
+      "action" : {
+        "bundleIdentifier" : "com.tinyspeck.slackmacgap",
+        "type" : "openApp"
+      },
+      "input" : {
+        "key" : "s",
+        "modifiers" : [
+          "fn"
+        ]
+      }
+    },
+    {
+      "action" : {
+        "bundleIdentifier" : "notion.id",
+        "type" : "openApp"
+      },
+      "input" : {
+        "key" : "n",
+        "modifiers" : [
+          "fn"
+        ]
+      }
+    },
+    {
+      "action" : {
+        "bundleIdentifier" : "com.linear",
+        "type" : "openApp"
+      },
+      "input" : {
+        "key" : "l",
+        "modifiers" : [
+          "fn"
+        ]
+      }
+    },
+    {
+      "action" : {
+        "bundleIdentifier" : "com.google.Chrome",
+        "type" : "openApp"
+      },
+      "input" : {
+        "key" : "b",
+        "modifiers" : [
+          "fn"
+        ]
+      }
+    },
+    {
+      "action" : {
+        "bundleIdentifier" : "md.obsidian",
+        "type" : "openApp"
+      },
+      "input" : {
+        "key" : "o",
+        "modifiers" : [
+          "fn"
+        ]
+      }
+    },
+    {
+      "action" : {
+        "bundleIdentifier" : "us.zoom.xos",
+        "type" : "openApp"
+      },
+      "input" : {
+        "key" : "z",
+        "modifiers" : [
+          "fn"
+        ]
+      }
+    },
+    {
+      "action" : {
+        "bundleIdentifier" : "com.todesktop.230313mzl4w4u92",
+        "type" : "openApp"
+      },
+      "input" : {
+        "key" : "e",
+        "modifiers" : [
+          "fn"
+        ]
+      }
+    }
+  ],
+  "superKey" : "controlOption",
+  "version" : 1
+}
